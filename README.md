@@ -23,8 +23,6 @@ for a personal machine with KVM, with no cloud cost, is [wanted](https://github.
 > - **Who can run it:** anyone comfortable with a terminal and SSH; no OpenStack knowledge needed to start.
 > - **What it does not include:** high availability, production use, block storage (Cinder), load balancing
 >   (Octavia), or support. It is a learning lab, deleted after use.
->
-> The OzarLand maintainer has a professional connection with Felcloud.
 
 ## Who this is for
 
@@ -66,8 +64,9 @@ describes. Each variant states the OpenStack and Kolla-Ansible releases its scri
 
 Felcloud is the variant recommended to start with, for one reason only: with a prepaid credit, a forgotten lab
 cannot produce a bill larger than the credit. Any other provider can be added as a variant on equal terms; nothing
-in the exercises depends on the provider. (The maintainer's professional connection with Felcloud is stated at
-the top of this page.)
+in the exercises depends on the provider.
+
+Felcloud was used to build and test OzarLand's labs because its prepaid model fits a lab with no surprise bill.
 
 ## Delete everything when you are done
 
