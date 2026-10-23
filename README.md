@@ -49,6 +49,8 @@ Felcloud is the variant recommended to start with, for one reason only: with a p
 cannot produce a bill larger than the credit. Any other provider can be added as a variant on equal terms; nothing
 in the exercises depends on the provider.
 
+The OzarLand maintainer has a professional connection with Felcloud.
+
 ## Delete everything when you are done
 
 A lab left running keeps costing money on a pay-as-you-go cloud, and keeps using credit on a prepaid one.
