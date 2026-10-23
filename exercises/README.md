@@ -25,13 +25,14 @@ lab (`status: lab-verified`).
   . /etc/kolla/admin-openrc.sh
   ```
 
-The lab's scripts run Kolla-Ansible's `init-runonce`, which creates the resources the exercises use:
+The lab's scripts run Kolla-Ansible's `init-runonce`, which creates the resources the exercises use (the
+[variant's guide](../variants/openstack-cloud/README.md#inside-the-lab) lists them too):
 
 | Resource | Name |
 |---|---|
 | Test image | `cirros` |
 | Flavor | `m1.tiny` |
-| Tenant network (behind a router) | `demo-net` |
+| Tenant network, behind the router `demo-router` | `demo-net` |
 | External network | `public1` |
 | Key pair | `mykey` |
 | External network's address range | the `LAB_EXT_CIDR` variable of the launch script, `10.99.0.0/24` by default |

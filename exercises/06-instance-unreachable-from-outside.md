@@ -57,11 +57,11 @@ The runbook notes that a client on the external network's own segment, like the 
   > `demo-net` loses its route to the outside. Undo: add the subnet back with the second command.
 
   ```bash
-  openstack router remove subnet <router> <demo-net-subnet>
-  openstack router add subnet <router> <demo-net-subnet>        # undo
+  openstack router remove subnet demo-router <demo-net-subnet>
+  openstack router add subnet demo-router <demo-net-subnet>        # undo
   ```
 
-  `openstack network show demo-net -c subnets` and `openstack router list` give the two names.
+  `openstack network show demo-net -c subnets` gives the subnet's ID.
 - Read **Where the router lives**: on this lab (ML2/OVS), look at the `qrouter-` namespace and its NAT rule for your
   floating IP.
 

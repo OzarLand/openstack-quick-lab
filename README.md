@@ -19,11 +19,11 @@ You need basic Linux skills (SSH, `sudo`, editing a file). You do not need to kn
 ## What you get
 
 - An **all-in-one OpenStack** on one VM, deployed with [Kolla-Ansible](https://docs.openstack.org/kolla-ansible/latest/):
-  the core services (Keystone, Glance, Nova, Neutron with Open vSwitch, Placement, Horizon), plus the test image,
-  networks and key pair the exercises use. The variant's guide lists exactly what it creates.
+  OpenStack 2026.1 with Keystone, Glance, Nova, Neutron (Open vSwitch), Placement, Heat and Horizon, plus the test
+  image, networks, key pair and test instance the exercises use. The variant's guide lists exactly what it creates.
 - **Guided exercises** in [`exercises/`](exercises/README.md): each one breaks one thing and repairs it with a runbook
   from [openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks) that was checked on a lab.
-- **One command that deletes everything** the lab created.
+- **One command that deletes everything** the lab created, and checks that nothing is left.
 
 The lab is built the way the [all-in-one lab pattern](https://github.com/OzarLand/kolla-ansible-deployment-patterns/blob/main/topologies/all-in-one-lab-on-a-single-vm.md)
 describes. Each variant states the OpenStack and Kolla-Ansible releases its scripts were last run on.
@@ -32,8 +32,8 @@ describes. Each variant states the OpenStack and Kolla-Ansible releases its scri
 
 1. **Choose where the lab runs** in the table below, and read that variant's cost line before anything else.
 2. **Follow the variant's guide.** For an OpenStack cloud: [`variants/openstack-cloud/`](variants/openstack-cloud/README.md).
-   It shows an estimated cost per hour before launching and asks you to confirm, then deploys the lab in about an
-   hour.
+   `create.sh` shows the estimated cost per hour and asks you to confirm before creating anything; `deploy.sh` then
+   deploys the lab in about an hour (57 minutes from `create.sh` to `destroy.sh` on the guide's last measured run).
 3. **Do your first exercise:** [DHCP agents down](exercises/01-dhcp-agents-down.md). Then
    [delete everything](#delete-everything-when-you-are-done).
 
@@ -41,7 +41,7 @@ describes. Each variant states the OpenStack and Kolla-Ansible releases its scri
 
 | Variant | Runs on | Cost risk | What to do before you start |
 |---|---|---|---|
-| [`openstack-cloud`](variants/openstack-cloud/README.md) on **Felcloud** | [Felcloud](https://felcloud.io/), a prepaid cloud service built on OpenStack | Spending cannot exceed the credit loaded | Load only the credit you are ready to spend. [Felcloud's pricing page](https://felcloud.io/pricing) states: "spend only what you loaded" (checked on 2026-10-23) |
+| [`openstack-cloud`](variants/openstack-cloud/README.md) on **Felcloud** | [Felcloud](https://felcloud.io/), a prepaid cloud service built on OpenStack | Spending cannot exceed the credit loaded | Load only the credit you are ready to spend. [Felcloud's pricing page](https://felcloud.io/pricing) says: "Top up your balance and spend only what you loaded" (checked on 2026-10-23); billed per second (same page) |
 | [`openstack-cloud`](variants/openstack-cloud/README.md) on a **pay-as-you-go** OpenStack cloud | Any OpenStack cloud billed by usage | Billed for every hour the VM, its volumes and its floating IPs exist, until you delete them | **Set a budget alert** in your provider's console before launching, and delete the lab when you are done |
 | Personal machine | Your own computer or server, with hardware virtualisation | **No cloud cost** | Not written yet: contributions welcome, see [CONTRIBUTING.md](CONTRIBUTING.md) |
 
@@ -55,13 +55,17 @@ The OzarLand maintainer has a professional connection with Felcloud.
 
 A lab left running keeps costing money on a pay-as-you-go cloud, and keeps using credit on a prepaid one.
 
-1. Run the variant's delete command, described at the end of its guide. It removes everything the launch created:
-   the VM, its volumes, its floating IP, its security group and its network objects.
+1. Run the variant's delete command. For the OpenStack cloud variant: `./destroy.sh` in
+   [`variants/openstack-cloud/`](variants/openstack-cloud/README.md). After asking, it deletes everything
+   `create.sh` created (the VM, its key, security group, port, floating IP and root volume if any) and fails loudly
+   if anything is left.
 2. Check in your provider's console (or with `openstack server list`, `openstack volume list`,
    `openstack floating ip list`) that nothing from the lab is left.
 3. On a pay-as-you-go cloud, check the next day that the usage really stopped.
 
 Every exercise ends with the same reminder.
+
+**Done for the day? Destroy the lab: every hour it exists costs money.**
 
 ## Exercises
 
