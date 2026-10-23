@@ -18,12 +18,12 @@ openstack security group rule create --ingress --protocol icmp --remote-ip 10.99
 openstack security group rule create --ingress --protocol tcp --dst-port 22 --remote-ip 10.99.0.0/24 ex6-sg
 openstack server create --image cirros --flavor m1.tiny --network demo-net --key-name mykey \
   --security-group ex6-sg --wait ex6-test
-openstack floating ip create public1
+openstack floating ip create public1 -f value -c floating_ip_address
 openstack server add floating ip ex6-test <floating-ip>
-ping -c 3 <floating-ip>
+sleep 30; ping -c 3 <floating-ip>
 ```
 
-The ping answers: that is the working state.
+The ping answers: that is the working state. (The 30 seconds let the instance finish booting.)
 
 ## 1. Break it, first way
 
@@ -34,8 +34,9 @@ openstack security group rule list --ingress ex6-sg
 openstack security group rule delete <icmp-rule-id> <ssh-rule-id>
 ```
 
-Ping and SSH time out. Now forget you did this, and follow the runbook's **Quick checks** in order. Which check finds
-it? Then apply the matching **Resolution** to put the rules back.
+After a few seconds, ping and SSH time out (one ping may still answer right after the delete). Now forget you did
+this, and follow the runbook's **Quick checks** in order. Which check finds it? Then apply the matching
+**Resolution** to put the rules back.
 
 ## 2. Break it, second way
 

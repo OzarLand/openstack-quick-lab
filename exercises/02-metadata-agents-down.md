@@ -39,7 +39,17 @@ openstack server create --image cirros --flavor m1.tiny --network demo-net --key
 
   On the lab the runbook comes from, CirrOS printed `failed 20/20 … request failed` and
   `failed to read iid from metadata`, waited about three minutes, then booted without its metadata.
-- An SSH login with your key would be refused, because the key never reached the instance.
+- An SSH login with your key is refused, because the key never reached the instance. To try it, give the instance a
+  floating IP once the console log ends with `cirros login:` (about three minutes after the creation):
+
+  ```bash
+  openstack floating ip create public1 -f value -c floating_ip_address
+  openstack server add floating ip ex2-test <floating-ip>
+  ssh -i ~/.ssh/id_ecdsa -o BatchMode=yes cirros@<floating-ip>
+  ```
+
+  The answer is `Permission denied (publickey,password).`: the instance runs and its SSH server answers, but it has
+  no key to accept yours.
 
 Before reading on: the instance got its address, so what is different about the SSH key?
 
@@ -63,6 +73,9 @@ openstack network agent list --agent-type metadata
 openstack console log show ex2-test | grep -iE 'instance-id|successful'
 ```
 
+If you gave the instance a floating IP, the SSH login now works:
+`ssh -i ~/.ssh/id_ecdsa cirros@<floating-ip> hostname` prints `ex2-test`.
+
 ## 5. Clean up
 
 If you stopped before the repair, start the service again first:
@@ -71,10 +84,11 @@ If you stopped before the repair, start the service again first:
 sudo systemctl start kolla-neutron_metadata_agent-container.service
 ```
 
-Then delete the test instance:
+Then delete the test instance, and its floating IP if you created one:
 
 ```bash
 openstack server delete --wait ex2-test
+openstack floating ip delete <floating-ip>
 ```
 
 **Done with the lab for today?** [Delete everything](../README.md#delete-everything-when-you-are-done): a running lab

@@ -34,7 +34,28 @@ The VM costs money **every hour it exists**, whether you use it or not, until yo
   the same day.
 - `create.sh` prints the estimate from `COST_PER_HOUR`, which you copy from your provider's price list, and waits for
   your confirmation. Include everything your provider bills for the lab: the flavor, and, if it bills them apart, the
-  root volume (created when the flavor has no 50 GB disk) and the floating IP (if you use one).
+  root volume (created when the flavor has no 50 GB disk) and the floating IP (if you use one). It refuses to start
+  while `COST_PER_HOUR` is empty; `./create.sh --no-cost-estimate` creates the lab anyway, without an estimate.
+
+### What a lab cost on Felcloud
+
+Prices from [Felcloud's pricing page](https://felcloud.io/pricing), pay-as-you-go, per hour, as listed on
+2026-10-23 (the page shows them in TND, and in EUR when you switch its currency; it says nothing about taxes):
+
+| Resource | Used by the lab | TND per hour | EUR per hour |
+|---|---|---|---|
+| Flavor `G0.basic.4c16g` (4 vCPU, 16 GB, 50 GB disk) | Always: `create.sh` chose it | 0.196 | 0.057 |
+| Floating IP | Only if you set `FLOATING_NETWORK` | 0.015 | 0.005 |
+| Root volume, 50 GB, HDD | No: the flavor has its own disk | (0.0035) | (0.0028) |
+
+| | TND | EUR |
+|---|---|---|
+| One full run, `create.sh` to `destroy.sh`: 56 min 41 s measured on 2026-10-23 | 0.19 (0.20 with a floating IP) | 0.05 (0.06 with a floating IP) |
+| Each extra day the lab is left running | 4.70 (5.06 with a floating IP) | 1.37 (1.49 with a floating IP) |
+
+These figures are the measured duration multiplied by the listed prices, not an amount read from an invoice. The
+exercises add their own time: about 0.20 TND (0.06 EUR) per hour. On Felcloud, set `COST_PER_HOUR="0.196"` and
+`CURRENCY="TND"` (`0.211` with a floating IP), or the EUR prices with `CURRENCY="EUR"`.
 
 ## What you need
 
@@ -87,6 +108,27 @@ exercises:
 | `public1` | The lab's external network, range `LAB_EXT_CIDR` (see `config.example.env`); its floating IPs are reachable from the VM itself |
 | `mykey` | A key pair; its private key is `~/.ssh/id_ecdsa` on the VM (`ssh -i ~/.ssh/id_ecdsa cirros@<floating-ip>`) |
 | `demo1` | The test instance, with a floating IP from `public1` |
+
+### Horizon, the dashboard
+
+Horizon runs on the VM, on port 80 of its address in `NETWORK`. The VM's security group only lets SSH and ping in, so
+reach Horizon through an SSH tunnel. On your computer, in the directory of the scripts:
+
+```bash
+ssh -i .state/<prefix><lab>/id_ed25519 -N -L 8080:<vm-fixed-address>:80 ubuntu@<vm-address>
+```
+
+`<vm-address>` is the address you log in to; `<vm-fixed-address>` is the VM's address in `NETWORK`
+(`VM_FIXED_ADDRESS` in `.state/<prefix><lab>/state.env`; the same as `<vm-address>` without a floating IP).
+`deploy.sh` prints this command, filled in, at the end. Leave it running and open <http://localhost:8080>.
+
+Log in with the user `admin`. The password is in `/etc/kolla/passwords.yml` on the VM:
+
+```bash
+sudo grep '^keystone_admin_password' /etc/kolla/passwords.yml
+```
+
+It is also the `OS_PASSWORD` of `/etc/kolla/admin-openrc.sh`. Stop the tunnel with Ctrl-C.
 
 ## What `deploy.sh` does, and why
 

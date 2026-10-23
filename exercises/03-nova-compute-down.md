@@ -38,6 +38,9 @@ sudo systemctl stop kolla-nova_compute-container.service
   sudo docker exec nova_libvirt virsh list --all
   ```
 
+  `ex3-test` is the line named like its `OS-EXT-SRV-ATTR:instance_name` (for example `instance-00000004`). Any other
+  line is another instance, such as `demo1`, the test instance the lab's scripts created.
+
 Before reading on: what keeps an instance running, if not `nova-compute`?
 
 ## 3. Diagnose and repair with the runbook

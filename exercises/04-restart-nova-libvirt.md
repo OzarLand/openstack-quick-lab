@@ -8,16 +8,24 @@ instances keep running.
 ## Before you start
 
 Read [before every exercise](README.md#before-every-exercise). You need an instance you can ping from the lab VM:
-create one with a floating IP, and allow ping to it.
+create one with a floating IP. The lab's `default` security group, which the instance gets, already allows ping and
+SSH.
 
 ```bash
 openstack server create --image cirros --flavor m1.tiny --network demo-net --key-name mykey --wait ex4-test
-openstack floating ip create public1
+openstack floating ip create public1 -f value -c floating_ip_address
 openstack server add floating ip ex4-test <floating-ip>
+```
+
+The second command prints only the address: that is `<floating-ip>`. Wait about 30 seconds (the instance is still
+booting, and the floating IP takes a few seconds to apply), then:
+
+```bash
 ping -c 3 <floating-ip>
 ```
 
-If the ping does not answer, the security group does not allow ICMP: exercise 6 shows how to find and fix that.
+If it still does not answer after a minute, check that the instance is `ACTIVE` and that the floating IP is
+attached (`openstack server show ex4-test -c status -c addresses`).
 
 Note the domain ID libvirt gives the instance:
 

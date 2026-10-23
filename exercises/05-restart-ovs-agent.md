@@ -24,10 +24,13 @@ Then, in the first session:
 > changed during the restart wait for the agent. Disposable lab only.
 
 ```bash
-sudo systemctl restart kolla-neutron_openvswitch_agent-container.service
+sudo systemctl restart --no-block kolla-neutron_openvswitch_agent-container.service
 ```
 
-Right after, create a second instance and time how long it takes to become `ACTIVE`:
+`--no-block` gives the prompt back at once while the restart goes on, about a minute. Without it, `systemctl` waits
+for the end of the restart, and the next command would come too late to see anything.
+
+Right away, while the agent restarts, create a second instance and time how long it takes to become `ACTIVE`:
 
 ```bash
 time openstack server create --image cirros --flavor m1.tiny --network demo-net --key-name mykey --wait ex5-second
@@ -36,7 +39,9 @@ time openstack server create --image cirros --flavor m1.tiny --network demo-net 
 ## 2. What you should see
 
 - The ping keeps answering. On the runbook's lab, no request was lost.
-- The restart of the unit takes about 70 s (runbook's lab observations).
+- The restart of the unit takes about a minute. During it,
+  `sudo systemctl status kolla-neutron_openvswitch_agent-container.service` shows `deactivating (stop)`, then
+  `active (running)` again (runbook's lab: about 70 s; 62 s on a later lab).
 - The second instance waits for the agent. In a
   [later lab review of the runbook](https://github.com/OzarLand/openstack-vm-runbooks/pull/2#issuecomment-6334698855),
   an instance requested during the restart became `ACTIVE` after about 80 s instead of 18 s, and the agent was
