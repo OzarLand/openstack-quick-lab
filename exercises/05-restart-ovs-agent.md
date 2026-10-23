@@ -30,15 +30,17 @@ sudo systemctl restart kolla-neutron_openvswitch_agent-container.service
 Right after, create a second instance and time how long it takes to become `ACTIVE`:
 
 ```bash
-time openstack server create --image <image> --flavor <flavor> --network <tenant-network> --key-name <key> --wait ex5-second
+time openstack server create --image cirros --flavor m1.tiny --network demo-net --key-name mykey --wait ex5-second
 ```
 
 ## 2. What you should see
 
 - The ping keeps answering. On the runbook's lab, no request was lost.
-- The restart itself takes about a minute.
-- On a later lab review, a new instance requested during the restart became `ACTIVE` after about 80 s instead of
-  18 s, and the agent showed as not alive for a few seconds at the end of the restart.
+- The restart of the unit takes about 70 s (runbook's lab observations).
+- The second instance waits for the agent. In a
+  [later lab review of the runbook](https://github.com/OzarLand/openstack-vm-runbooks/pull/2#issuecomment-6334698855),
+  an instance requested during the restart became `ACTIVE` after about 80 s instead of 18 s, and the agent was
+  reported not alive for a few seconds at the end of the restart.
 
 Before reading on: if the agent restarts, what keeps forwarding the packets?
 

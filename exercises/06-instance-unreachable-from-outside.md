@@ -12,11 +12,11 @@ the external network, and an instance that uses it, with a floating IP:
 
 ```bash
 openstack security group create ex6-sg
-openstack security group rule create --ingress --protocol icmp --remote-ip <external-network-cidr> ex6-sg
-openstack security group rule create --ingress --protocol tcp --dst-port 22 --remote-ip <external-network-cidr> ex6-sg
-openstack server create --image <image> --flavor <flavor> --network <tenant-network> --key-name <key> \
+openstack security group rule create --ingress --protocol icmp --remote-ip "${LAB_EXT_CIDR:-10.99.0.0/24}" ex6-sg
+openstack security group rule create --ingress --protocol tcp --dst-port 22 --remote-ip "${LAB_EXT_CIDR:-10.99.0.0/24}" ex6-sg
+openstack server create --image cirros --flavor m1.tiny --network demo-net --key-name mykey \
   --security-group ex6-sg --wait ex6-test
-openstack floating ip create <external-network>
+openstack floating ip create public1
 openstack server add floating ip ex6-test <floating-ip>
 ping -c 3 <floating-ip>
 ```
@@ -50,8 +50,18 @@ The runbook notes that a client on the external network's own segment, like the 
 
 ## 3. Go further
 
-- The runbook's cause 3: try `openstack router remove subnet` on the router of `<tenant-network>` while the floating
-  IP is associated. On the runbook's lab, Neutron refused with HTTP 409. Why does it refuse?
+- The runbook's cause 3: try to remove `demo-net`'s subnet from its router while the floating IP is associated.
+  On the runbook's lab, Neutron refused with HTTP 409. Why does it refuse?
+
+  > ⚠️ **State-changing.** If Neutron accepts it (for example once the floating IP is gone), every instance of
+  > `demo-net` loses its route to the outside. Undo: add the subnet back with the second command.
+
+  ```bash
+  openstack router remove subnet <router> <demo-net-subnet>
+  openstack router add subnet <router> <demo-net-subnet>        # undo
+  ```
+
+  `openstack network show demo-net -c subnets` and `openstack router list` give the two names.
 - Read **Where the router lives**: on this lab (ML2/OVS), look at the `qrouter-` namespace and its NAT rule for your
   floating IP.
 

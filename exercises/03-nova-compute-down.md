@@ -10,7 +10,7 @@ does.
 Read [before every exercise](README.md#before-every-exercise). Create a test instance and note where it runs:
 
 ```bash
-openstack server create --image <image> --flavor <flavor> --network <tenant-network> --key-name <key> --wait ex3-test
+openstack server create --image cirros --flavor m1.tiny --network demo-net --key-name mykey --wait ex3-test
 openstack server show ex3-test -c status -c OS-EXT-SRV-ATTR:instance_name
 openstack compute service list --service nova-compute
 ```
@@ -60,6 +60,14 @@ openstack server show ex3-test -c status
 ```
 
 ## 5. Clean up
+
+If you stopped before the repair, start the service again first:
+
+```bash
+sudo systemctl start kolla-nova_compute-container.service
+```
+
+Then delete the test instance:
 
 ```bash
 openstack server delete --wait ex3-test

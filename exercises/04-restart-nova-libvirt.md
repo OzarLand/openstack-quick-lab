@@ -11,8 +11,8 @@ Read [before every exercise](README.md#before-every-exercise). You need an insta
 create one with a floating IP, and allow ping to it.
 
 ```bash
-openstack server create --image <image> --flavor <flavor> --network <tenant-network> --key-name <key> --wait ex4-test
-openstack floating ip create <external-network>
+openstack server create --image cirros --flavor m1.tiny --network demo-net --key-name mykey --wait ex4-test
+openstack floating ip create public1
 openstack server add floating ip ex4-test <floating-ip>
 ping -c 3 <floating-ip>
 ```

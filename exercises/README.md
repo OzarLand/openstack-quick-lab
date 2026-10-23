@@ -17,10 +17,27 @@ lab (`status: lab-verified`).
 ## Before every exercise
 
 - The lab is running, and you followed its variant's guide to the end.
-- You are logged in to the lab VM over SSH, with `sudo`, and the OpenStack admin credentials are loaded as the
-  variant's guide explains.
-- You know the names the guide gave to the test image, flavor, tenant network, external network and key pair. The
-  exercises write them `<image>`, `<flavor>`, `<tenant-network>`, `<external-network>` and `<key>`.
+- You are logged in to the lab VM over SSH, with `sudo`.
+- The OpenStack client is loaded, with the admin credentials:
+
+  ```bash
+  source ~/kolla-venv/bin/activate
+  . /etc/kolla/admin-openrc.sh
+  ```
+
+The lab's scripts run Kolla-Ansible's `init-runonce`, which creates the resources the exercises use:
+
+| Resource | Name |
+|---|---|
+| Test image | `cirros` |
+| Flavor | `m1.tiny` |
+| Tenant network (behind a router) | `demo-net` |
+| External network | `public1` |
+| Key pair | `mykey` |
+| External network's address range | the `LAB_EXT_CIDR` variable of the launch script, `10.99.0.0/24` by default |
+
+The exercises use `"${LAB_EXT_CIDR:-10.99.0.0/24}"` for the external range. If you changed `LAB_EXT_CIDR` when you
+launched the lab, set it to the same value in your shell on the lab VM (`export LAB_EXT_CIDR=<your-range>`).
 
 On the all-in-one lab, the controller, the network node and the compute are the same VM: every command runs there.
 

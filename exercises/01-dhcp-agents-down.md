@@ -24,7 +24,7 @@ sudo systemctl stop kolla-neutron_dhcp_agent-container.service
 Wait a minute, then create a test instance:
 
 ```bash
-openstack server create --image <image> --flavor <flavor> --network <tenant-network> --key-name <key> --wait ex1-test
+openstack server create --image cirros --flavor m1.tiny --network demo-net --key-name mykey --wait ex1-test
 ```
 
 ## 2. What you should see
@@ -61,6 +61,14 @@ openstack console log show ex1-test | grep -iE 'lease|bound'
 ```
 
 ## 5. Clean up
+
+If you stopped before the repair, start the service again first:
+
+```bash
+sudo systemctl start kolla-neutron_dhcp_agent-container.service
+```
+
+Then delete the test instance:
 
 ```bash
 openstack server delete --wait ex1-test

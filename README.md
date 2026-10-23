@@ -41,7 +41,7 @@ describes. Each variant states the OpenStack and Kolla-Ansible releases its scri
 
 | Variant | Runs on | Cost risk | What to do before you start |
 |---|---|---|---|
-| [`openstack-cloud`](variants/openstack-cloud/README.md) on **Felcloud** | Felcloud, a prepaid cloud service built on OpenStack | Spending cannot exceed the credit loaded | Load only the credit you are ready to spend. The variant's guide links to the provider's own terms that state this |
+| [`openstack-cloud`](variants/openstack-cloud/README.md) on **Felcloud** | Felcloud, a prepaid cloud service built on OpenStack | Spending cannot exceed the credit loaded | Load only the credit you are ready to spend. Check the provider's own terms that state this before you rely on it |
 | [`openstack-cloud`](variants/openstack-cloud/README.md) on a **pay-as-you-go** OpenStack cloud | Any OpenStack cloud billed by usage | Billed for every hour the VM, its volumes and its floating IPs exist, until you delete them | **Set a budget alert** in your provider's console before launching, and delete the lab when you are done |
 | Personal machine | Your own computer or server, with hardware virtualisation | **No cloud cost** | Not written yet: contributions welcome, see [CONTRIBUTING.md](CONTRIBUTING.md) |
 
