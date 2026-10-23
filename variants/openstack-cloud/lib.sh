@@ -1,6 +1,10 @@
 # shellcheck shell=bash
 # Common functions of the openstack-quick-lab scripts (sourced, not run).
 set -euo pipefail
+# Needs bash 4.4 or later (empty arrays under set -u). macOS ships bash 3.2: install a newer bash.
+if [ "${BASH_VERSINFO[0]}" -lt 4 ] || { [ "${BASH_VERSINFO[0]}" -eq 4 ] && [ "${BASH_VERSINFO[1]}" -lt 4 ]; }; then
+  echo "These scripts need bash 4.4 or later (this is $BASH_VERSION)." >&2; exit 1
+fi
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 [ -f "$HERE/config.env" ] || { echo "Missing $HERE/config.env: copy config.example.env to config.env and fill it in." >&2; exit 1; }
 # shellcheck source=/dev/null
@@ -12,7 +16,7 @@ STATE="$STATE_DIR/state.env"
 KEY="$STATE_DIR/id_ed25519"
 LOG="$STATE_DIR/log.txt"
 
-say()  { printf '%s %s\n' "$(date -u +%H:%M:%S)" "$*" | tee -a "${LOG:-/dev/null}"; }
+say()  { mkdir -p "$STATE_DIR"; printf '%s %s\n' "$(date -u +%H:%M:%S)" "$*" | tee -a "$LOG"; }
 die()  { echo "ERROR: $*" >&2; exit 1; }
 need() { command -v "$1" >/dev/null || die "'$1' is required. $2"; }
 confirm() { local a; read -r -p "$1 [y/N] " a; [ "$a" = y ] || [ "$a" = Y ] || { echo "Cancelled."; exit 1; }; }
