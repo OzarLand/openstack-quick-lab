@@ -2,10 +2,29 @@
 
 # openstack-quick-lab
 
-**Try OpenStack in about one hour on a single VM, break it on purpose, repair it with real runbooks, and delete
-everything when you are done, with no risk of a surprise bill.**
+**Try OpenStack in about one hour on a single VM. On a prepaid cloud you cannot spend more than your credit; on any
+other cloud, set a budget alert first.**
 
 Part of [OzarLand](https://github.com/OzarLand/ozarland), a knowledge-sharing space for OpenStack operators.
+
+**Requires:** an OpenStack cloud account with a quota of 4 vCPU, 16 GB of RAM and 50 GB of disk (one VM). A variant
+for a personal machine with KVM, with no cloud cost, is [wanted](https://github.com/OzarLand/openstack-quick-lab/issues/5).
+
+> **In one minute (for managers)**
+>
+> - **What it is:** scripts that build a complete, disposable OpenStack (2026.1) on one virtual machine, and six
+>   exercises where you break it on purpose and repair it with documented procedures. For learning and for trying
+>   a procedure before production.
+> - **What it costs:** one VM for about an hour. One full run measured on the reference cloud: **€ _to be measured_**.
+>   The script shows the estimated cost per hour and asks before creating anything.
+> - **The risk:** the VM costs money every hour it exists, until it is deleted. On a prepaid cloud, such as
+>   [Felcloud](https://felcloud.io/), the recommended starting point, spending cannot go beyond the credit loaded.
+>   On a pay-as-you-go cloud, set a budget alert first. One command deletes everything.
+> - **Who can run it:** anyone comfortable with a terminal and SSH; no OpenStack knowledge needed to start.
+> - **What it does not include:** high availability, production use, block storage (Cinder), load balancing
+>   (Octavia), or support. It is a learning lab, deleted after use.
+>
+> The OzarLand maintainer has a professional connection with Felcloud.
 
 ## Who this is for
 
@@ -43,13 +62,12 @@ describes. Each variant states the OpenStack and Kolla-Ansible releases its scri
 |---|---|---|---|
 | [`openstack-cloud`](variants/openstack-cloud/README.md) on **Felcloud** | [Felcloud](https://felcloud.io/), a prepaid cloud service built on OpenStack | Spending cannot exceed the credit loaded | Load only the credit you are ready to spend. [Felcloud's pricing page](https://felcloud.io/pricing) says: "Top up your balance and spend only what you loaded" (checked on 2026-10-23); billed per second (same page) |
 | [`openstack-cloud`](variants/openstack-cloud/README.md) on a **pay-as-you-go** OpenStack cloud | Any OpenStack cloud billed by usage | Billed for every hour the VM, its volumes and its floating IPs exist, until you delete them | **Set a budget alert** in your provider's console before launching, and delete the lab when you are done |
-| Personal machine | Your own computer or server, with hardware virtualisation | **No cloud cost** | Not written yet: contributions welcome, see [CONTRIBUTING.md](CONTRIBUTING.md) |
+| Personal machine | Your own computer or server, with hardware virtualisation | **No cloud cost** | Not written yet: [issue #5](https://github.com/OzarLand/openstack-quick-lab/issues/5); contributions welcome, see [CONTRIBUTING.md](CONTRIBUTING.md) |
 
 Felcloud is the variant recommended to start with, for one reason only: with a prepaid credit, a forgotten lab
 cannot produce a bill larger than the credit. Any other provider can be added as a variant on equal terms; nothing
-in the exercises depends on the provider.
-
-The OzarLand maintainer has a professional connection with Felcloud.
+in the exercises depends on the provider. (The maintainer's professional connection with Felcloud is stated at
+the top of this page.)
 
 ## Delete everything when you are done
 
