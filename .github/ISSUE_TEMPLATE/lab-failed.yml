@@ -1,0 +1,76 @@
+name: The lab failed at a step
+description: A script or a step of the guide did not work as written, or the delete command left something behind.
+labels: ["kind/bug", "status/open"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Never paste credentials, `clouds.yaml`, `config.env` values, passwords, private keys, real IP addresses or
+        hostnames.** Replace them with placeholders such as `<vm-address>`. If a credential was exposed, revoke it at
+        your provider first, and use the [security policy](https://github.com/OzarLand/openstack-quick-lab/blob/main/SECURITY.md) instead of this form.
+  - type: dropdown
+    id: variant
+    attributes:
+      label: Variant
+      options:
+        - openstack-cloud
+        - other (say which in the details)
+    validations:
+      required: true
+  - type: dropdown
+    id: step
+    attributes:
+      label: Step that failed
+      options:
+        - create.sh
+        - deploy.sh
+        - destroy.sh (something was left behind, or it failed)
+        - inside the lab, after deploy.sh
+        - an exercise
+        - the guide itself (a step is missing or wrong)
+    validations:
+      required: true
+  - type: input
+    id: provider
+    attributes:
+      label: Kind of cloud or machine
+      description: Prepaid or pay-as-you-go OpenStack cloud, personal machine. Name the provider only if it matters.
+      placeholder: "pay-as-you-go OpenStack cloud, no direct Internet access (HTTPS proxy)"
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Commit or date of the scripts, OpenStack and Kolla-Ansible versions
+      placeholder: "main of 2026-10-23, OpenStack 2026.1, Kolla-Ansible 22.2.0"
+  - type: textarea
+    id: error
+    attributes:
+      label: The error
+      description: The last lines of the script's output, or the failing Ansible task (redacted). `deploy.sh` keeps its logs in `~/.quicklab/` on the VM.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: What you did, and what you already tried
+      description: The configuration you changed from `config.example.env` (names only, never values that are secrets), and anything you tried.
+  - type: dropdown
+    id: cost
+    attributes:
+      label: Is anything from the lab still running?
+      description: If yes, delete it in your provider's console now. A resource left behind keeps costing.
+      options:
+        - No, everything is deleted
+        - Yes, and I am deleting it by hand
+        - I do not know
+    validations:
+      required: true
+  - type: checkboxes
+    id: redaction
+    attributes:
+      label: Redaction
+      options:
+        - label: This issue contains no credentials, passwords, private keys, real IP addresses or hostnames.
+          required: true
