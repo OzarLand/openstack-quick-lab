@@ -8,12 +8,14 @@ checks, in order.
 ## Before you start
 
 Read [before every exercise](README.md#before-every-exercise). Create a security group that allows ping and SSH from
-the external network, and an instance that uses it, with a floating IP:
+the external network, and an instance that uses it, with a floating IP. `10.99.0.0/24` is the lab's default external
+range; if you changed `LAB_EXT_CIDR` in `config.env`, use your range instead.
+
 
 ```bash
 openstack security group create ex6-sg
-openstack security group rule create --ingress --protocol icmp --remote-ip "${LAB_EXT_CIDR:-10.99.0.0/24}" ex6-sg
-openstack security group rule create --ingress --protocol tcp --dst-port 22 --remote-ip "${LAB_EXT_CIDR:-10.99.0.0/24}" ex6-sg
+openstack security group rule create --ingress --protocol icmp --remote-ip 10.99.0.0/24 ex6-sg
+openstack security group rule create --ingress --protocol tcp --dst-port 22 --remote-ip 10.99.0.0/24 ex6-sg
 openstack server create --image cirros --flavor m1.tiny --network demo-net --key-name mykey \
   --security-group ex6-sg --wait ex6-test
 openstack floating ip create public1

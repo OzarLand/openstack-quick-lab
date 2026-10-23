@@ -37,8 +37,8 @@ The lab's scripts run Kolla-Ansible's `init-runonce`, which creates the resource
 | Key pair | `mykey` |
 | External network's address range | the `LAB_EXT_CIDR` variable of the launch script, `10.99.0.0/24` by default |
 
-The exercises use `"${LAB_EXT_CIDR:-10.99.0.0/24}"` for the external range. If you changed `LAB_EXT_CIDR` when you
-launched the lab, set it to the same value in your shell on the lab VM (`export LAB_EXT_CIDR=<your-range>`).
+The exercises write the external range as `10.99.0.0/24`. If you changed `LAB_EXT_CIDR` in `config.env` before
+launching the lab, use your range instead.
 
 On the all-in-one lab, the controller, the network node and the compute are the same VM: every command runs there.
 
