@@ -27,11 +27,9 @@ ansible-core 2.20.10, images from quay.io, Ubuntu 24.04 VM with nested KVM, a pr
 The VM costs money **every hour it exists**, whether you use it or not, until you run `./destroy.sh`.
 
 - **Prepaid cloud**: spending cannot go beyond the credit you loaded. Felcloud, the first cloud these scripts were
-  tested on, is prepaid. Its [pricing page](https://felcloud.io/pricing) says: *"Prepaid, in your control. Top up
-  your balance and spend only what you loaded. No unexpected charges, ever."* (checked on 2026-10-23). It also bills
-  per second (*"Billed per second. Spin up a VM for 10 minutes and pay for exactly 10 minutes, nothing more."*), which
-  matters for a lab you create and destroy the same day. For another prepaid provider, check its own terms before you
-  rely on it.
+  tested on, is prepaid: its [pricing page](https://felcloud.io/pricing) says *"Top up your balance and spend only
+  what you loaded."* (checked on 2026-10-23), and it bills per second (same page). For another prepaid provider,
+  check its own terms before you rely on it.
 - **Pay-as-you-go cloud**: set a budget alert in your provider's console **before** you start, and destroy the lab
   the same day.
 - `create.sh` prints the estimate from `COST_PER_HOUR`, which you copy from your provider's price list, and waits for
