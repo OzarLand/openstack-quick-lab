@@ -1,0 +1,67 @@
+name: An exercise did not behave as written
+description: What you saw differed from the exercise, or the runbook it links to did not help.
+labels: ["kind/docs", "status/open"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you: a difference between an exercise and what really happens is exactly what we want to know.
+        **Never paste credentials, real IP addresses or hostnames**; the lab's own names (`demo-net`, `public1`,
+        floating IPs from the lab's default range) are fine.
+  - type: dropdown
+    id: exercise
+    attributes:
+      label: Exercise
+      options:
+        - 1. DHCP agents down
+        - 2. Metadata agents down
+        - 3. nova-compute down
+        - 4. Restarting nova_libvirt
+        - 5. Restarting the Open vSwitch agent
+        - 6. Instance unreachable from outside
+        - the exercises index or another exercise
+    validations:
+      required: true
+  - type: input
+    id: step
+    attributes:
+      label: Step of the exercise
+      placeholder: "2. What you should see"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What the exercise says, and what you saw instead
+      description: Commands run and their output (redacted).
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Variant, OpenStack and Kolla-Ansible versions
+      placeholder: "openstack-cloud, OpenStack 2026.1, Kolla-Ansible 22.2.0"
+  - type: dropdown
+    id: runbook
+    attributes:
+      label: Did the linked runbook help?
+      description: If the runbook itself is wrong, it may need an issue in openstack-vm-runbooks too.
+      options:
+        - Yes
+        - Partly
+        - No
+        - I did not get that far
+  - type: checkboxes
+    id: offer
+    attributes:
+      label: Offer
+      options:
+        - label: I am willing to propose the fix myself.
+  - type: checkboxes
+    id: redaction
+    attributes:
+      label: Redaction
+      options:
+        - label: This issue contains no credentials, passwords, real IP addresses or hostnames.
+          required: true

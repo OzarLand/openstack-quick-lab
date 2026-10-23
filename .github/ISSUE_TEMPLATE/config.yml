@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Ask the community (Q&A discussion)
+    url: https://github.com/OzarLand/ozarland/discussions/categories/q-a
+    about: A question about OpenStack rather than about this lab? Ask in Discussions.
+  - name: A credential published by mistake, or an unsafe script
+    url: https://github.com/OzarLand/openstack-quick-lab/blob/main/SECURITY.md
+    about: Do not open a public issue. Revoke the credential first, then follow the security policy.
+  - name: A runbook used by an exercise is wrong
+    url: https://github.com/OzarLand/openstack-vm-runbooks/issues/new/choose
+    about: Report it on the runbook's repository.
+  - name: Vulnerability in OpenStack itself
+    url: https://security.openstack.org/
+    about: Upstream vulnerabilities go to the OpenStack Vulnerability Management Team.
