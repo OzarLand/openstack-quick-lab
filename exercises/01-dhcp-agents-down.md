@@ -30,14 +30,15 @@ openstack server create --image cirros --flavor m1.tiny --network demo-net --key
 ## 2. What you should see
 
 - `openstack server show ex1-test -c status` says `ACTIVE`, and `addresses` shows an IP address: Neutron allocated it.
-- The instance never received it. In its console log, the DHCP client asks and gets no answer:
+- The instance never received it. In its console log, the DHCP client asks and gets no answer. Wait about three
+  minutes after the creation, then:
 
   ```bash
   openstack console log show ex1-test | grep -iE 'dhcp|lease'
   ```
 
   On the lab the runbook comes from, CirrOS printed `soliciting a DHCP lease`, then timed out after about three
-  minutes.
+  minutes. Run the command earlier and you only see `soliciting a DHCP lease`: CirrOS is still trying.
 
 Before reading on, ask yourself: Nova says the instance is fine, so which service hands out addresses?
 

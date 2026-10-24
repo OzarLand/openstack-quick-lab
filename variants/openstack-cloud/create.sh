@@ -1,7 +1,19 @@
 #!/usr/bin/env bash
 # Create the lab VM: one VM (4 vCPU, 16 GB RAM, 50 GB disk), its key, security group, port and, optionally, a
 # floating IP. Shows the estimated cost per hour and asks for confirmation before creating anything.
+# Refuses to run without COST_PER_HOUR, unless started with --no-cost-estimate.
 . "$(dirname "$0")/lib.sh"
+NO_COST_ESTIMATE=""
+for a in "$@"; do
+  case "$a" in
+    --no-cost-estimate) NO_COST_ESTIMATE=yes ;;
+    *) die "Unknown option: $a (the only option is --no-cost-estimate)." ;;
+  esac
+done
+if [ -z "$COST_PER_HOUR" ] && [ -z "$NO_COST_ESTIMATE" ]; then
+  die "COST_PER_HOUR is empty in config.env. Copy the price per hour of the flavor (plus the floating IP and root volume if your provider bills them apart) from your provider's price list. To create the lab without a cost estimate anyway, run: ./create.sh --no-cost-estimate"
+fi
+[ -z "$COST_PER_HOUR" ] || [[ "$COST_PER_HOUR" =~ ^[0-9]+([.][0-9]+)?$ ]] || die "COST_PER_HOUR=$COST_PER_HOUR is not a number (write it like 0.196, with a dot)."
 need openstack "Install python-openstackclient (pip install python-openstackclient)."
 need ssh-keygen "Install OpenSSH."
 grep -qE '^(OS_CLOUD|NETWORK|SSH_FROM)=".*<' "$HERE/config.env" && die "Fill in OS_CLOUD, NETWORK and SSH_FROM in config.env."
@@ -46,7 +58,7 @@ if [ -n "$COST_PER_HOUR" ]; then
   echo "  estimated cost  $COST_PER_HOUR $CURRENCY per hour (COST_PER_HOUR: the flavor, plus the root volume and the floating IP if your provider bills them apart)"
   echo "                  $COST_PER_HOUR $CURRENCY per hour, $(awk -v c="$COST_PER_HOUR" 'BEGIN{printf "%.2f", c*24}') $CURRENCY per day, until you run destroy.sh"
 else
-  echo "  estimated cost  UNKNOWN: set COST_PER_HOUR in config.env from your provider's price list"
+  echo "  estimated cost  UNKNOWN (--no-cost-estimate): you chose to create the lab without COST_PER_HOUR"
 fi
 echo "The VM costs money every hour it exists. Run ./destroy.sh when you are done."
 confirm "Create it?"

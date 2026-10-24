@@ -12,6 +12,8 @@ ssh_vm "KOLLA_ANSIBLE_VERSION='$KOLLA_ANSIBLE_VERSION' ANSIBLE_CORE_VERSION='$AN
   bash remote-deploy.sh" 2>&1 | tee -a "$LOG"
 rc=${PIPESTATUS[0]}
 set -e
-if [ "$rc" = 0 ]; then say "Done. Log in with: ssh -i $KEY $SSH_USER@$VM_ADDRESS   Remember: ./destroy.sh when you are done."
+if [ "$rc" = 0 ]; then
+  say "Done. Log in with: ssh -i $KEY $SSH_USER@$VM_ADDRESS   Remember: ./destroy.sh when you are done."
+  say "Horizon: ssh -i $KEY -N -L 8080:$VM_FIXED_ADDRESS:80 $SSH_USER@$VM_ADDRESS   then open http://localhost:8080 (user admin; password: see the guide)"
 else say "deploy failed (exit $rc); fix the cause and run ./deploy.sh again."; fi
 exit "$rc"

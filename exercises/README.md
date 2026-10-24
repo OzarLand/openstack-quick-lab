@@ -42,6 +42,18 @@ launching the lab, use your range instead.
 
 On the all-in-one lab, the controller, the network node and the compute are the same VM: every command runs there.
 
+Two things you will meet in every exercise:
+
+- **Run the runbooks' `docker` and `systemctl` commands with `sudo`.** The runbooks write them without it (for
+  example `docker ps -a …` and `systemctl start kolla-…`). Without `sudo`, the `ubuntu` user of the lab gets
+  `permission denied while trying to connect to the docker API` and an authentication prompt.
+- **`systemctl` prints a warning** such as `The unit file, source configuration file or drop-ins of
+  kolla-…-container.service changed on disk. Run 'systemctl daemon-reload' to reload units.` It is harmless on
+  these labs, and the command still worked: you do not need to run `daemon-reload`.
+
+Wherever a page writes `<floating-ip>`, use the address printed by the `openstack floating ip create` command just
+before it. Note it down: you will also need it in a second SSH session.
+
 These exercises break things on purpose. Run them only on this disposable lab, never on a platform someone relies
 on.
 
