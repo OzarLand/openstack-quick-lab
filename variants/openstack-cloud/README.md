@@ -40,13 +40,15 @@ The VM costs money **every hour it exists**, whether you use it or not, until yo
 ### What a lab cost on Felcloud
 
 Prices from [Felcloud's pricing page](https://felcloud.io/pricing), pay-as-you-go, per hour, as listed on
-2026-10-23 (the page shows them in TND, and in EUR when you switch its currency; it says nothing about taxes):
+2026-10-23 and checked again on 2026-10-24. The page shows them in TND, and in EUR when you switch its currency. The
+EUR prices are the page's own, not a conversion of the TND ones, so the ratio between the two columns varies from row
+to row. The page says nothing about taxes.
 
 | Resource | Used by the lab | TND per hour | EUR per hour |
 |---|---|---|---|
 | Flavor `G0.basic.4c16g` (4 vCPU, 16 GB, 50 GB disk) | Always: `create.sh` chose it | 0.196 | 0.057 |
 | Floating IP | Only if you set `FLOATING_NETWORK` | 0.015 | 0.005 |
-| Root volume, 50 GB, HDD | No: the flavor has its own disk | (0.0035) | (0.0028) |
+| Root volume, 50 GB, HDD (0.000070 TND or 0.000056 EUR per GiB per hour) | No: the flavor has its own disk | (0.0035) | (0.0028) |
 
 | | TND | EUR |
 |---|---|---|
