@@ -87,7 +87,9 @@ The same safety rules as the [single-VM variant](../openstack-cloud/README.md):
   `quicklab-multi-1-ctl-1-gw`; `quicklab-multi-1-vip` with 3 controllers; the network `quicklab-multi-1-ext` and its
   subnet; `quicklab-multi-1-sg`; `quicklab-multi-1-key`; `<vm>-root` when a flavor has no disk. The floating IP
   carries the lab's name in its description. `destroy.sh` finds them all by these names, even if the creation failed
-  half-way or `.state/` was lost.
+  half-way or `.state/` was lost. It deletes **everything** in the project whose name starts with `${PREFIX}${LAB}-`
+  (after listing it and asking), so keep `PREFIX` specific to the lab: never a prefix that other resources of your
+  project share.
 - **Destroy checks that nothing is left**: it lists every kind of resource again after deleting, and fails loudly if
   anything of the lab is still there.
 
