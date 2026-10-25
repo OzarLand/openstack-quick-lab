@@ -13,7 +13,7 @@
 Read [before every exercise](README.md#before-every-exercise) and the
 [multinode variant's guide](../variants/openstack-cloud-multinode/README.md). This exercise uses two terminals:
 
-- **Lab terminal:** logged in to the lab's controller, with the lab's admin credentials loaded.
+- **Lab terminal:** logged in to controller 1, with the lab's admin credentials loaded.
 - **Hosting terminal:** on your own computer, in the directory of the scripts, with the `OS_CLOUD` of your
   `config.env`: it talks to the cloud that hosts the lab VMs, not to the lab.
 
@@ -31,10 +31,19 @@ openstack server create --image cirros --flavor m1.tiny --network demo-net --key
 openstack server show ex7-test -c status -c OS-EXT-SRV-ATTR:host
 ```
 
-In the hosting terminal, find the lab VM that is `<compute-1>`, written `<compute-1-vm>` below:
+In the hosting terminal, find the lab VM that is `<compute-1>`, written `<compute-1-vm>` below. The computes are
+named in Nova like their VMs (`quicklab-multi-1-cmp-1` and `-cmp-2` with the default `PREFIX` and `LAB`), so it is
+usually the same name:
 
 ```bash
-openstack server list --name '^<prefix><lab>'
+openstack server list --name '^<prefix><lab>-'
+```
+
+To log in to a compute from controller 1, use the lab's key and the compute's address in `NETWORK` (the
+[variant's guide](../variants/openstack-cloud-multinode/README.md#inside-the-lab) says where to find it):
+
+```bash
+ssh -i ~/.ssh/quicklab_ed25519 ubuntu@<compute-1-address>
 ```
 
 ## 1. Break it
@@ -42,7 +51,7 @@ openstack server list --name '^<prefix><lab>'
 > ⚠️ **State-changing.** Stops `nova-compute` on `<compute-1>`. Nova sees the compute as `down`; its instances keep
 > running. Disposable lab only.
 
-On `<compute-1>` (log in to it from the controller, as the variant's guide shows):
+On `<compute-1>` (logged in from controller 1, as above):
 
 ```bash
 sudo systemctl stop kolla-nova_compute-container.service

@@ -12,8 +12,8 @@ checked on a lab; it also covers live migration)
 ## Before you start
 
 Read [before every exercise](README.md#before-every-exercise) and the
-[multinode variant's guide](../variants/openstack-cloud-multinode/README.md). Work on the lab's controller, with the
-lab's admin credentials loaded.
+[multinode variant's guide](../variants/openstack-cloud-multinode/README.md). Work on controller 1, with the lab's
+admin credentials loaded.
 
 List the two computes and note their names, written `<compute-1>` (the one you will drain) and `<compute-2>` below:
 
@@ -77,7 +77,7 @@ Follow the runbook from its **Quick checks**:
    > ⚠️ **State-changing.** Reboots the lab VM that is `<compute-1>`. Nothing runs on it any more.
 
    ```bash
-   openstack server list --name '^<prefix><lab>'      # find the VM that is <compute-1>
+   openstack server list --name '^<prefix><lab>-'     # the VM named like <compute-1>
    openstack server reboot <compute-1-vm>
    ```
 

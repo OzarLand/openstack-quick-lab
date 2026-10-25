@@ -12,8 +12,8 @@ checked on a lab; it also covers live migration)
 ## Before you start
 
 Read [before every exercise](README.md#before-every-exercise) and the
-[multinode variant's guide](../variants/openstack-cloud-multinode/README.md). Work on the lab's controller, with the
-lab's admin credentials loaded, in two SSH sessions.
+[multinode variant's guide](../variants/openstack-cloud-multinode/README.md). Work on controller 1, with the lab's
+admin credentials loaded, in two SSH sessions.
 
 List the two computes and note their names, written `<compute-1>` and `<compute-2>` below:
 
@@ -30,8 +30,8 @@ openstack floating ip create public1 -f value -c floating_ip_address
 openstack server add floating ip ex9-test <floating-ip>
 ```
 
-Wait about 30 seconds, then check that it answers, from the host where `public1` is reachable (the variant's guide
-says which):
+Wait about 30 seconds, then check that it answers, from controller 1 (the floating IPs of `public1` are reachable
+from there):
 
 ```bash
 ping -c 3 <floating-ip>
@@ -64,8 +64,10 @@ openstack server show ex9-test -c status -c OS-EXT-SRV-ATTR:host
 
 - The status goes `MIGRATING`, then `ACTIVE` again, and the host changes from `<compute-1>` to `<compute-2>`.
 - In the second session, stop the ping with Ctrl-C and read its summary: how many packets were lost, and for how
-  long? Note it: that is what a user of this instance would have noticed.
-- On `<compute-2>`, the instance now runs in the hypervisor; on `<compute-1>`, it is gone:
+  long? Note it: that is what a user of this instance would have noticed. For comparison, the variant's smoke test
+  measured 43 replies lost out of 166, about 8.6 s, for a live migration of 35 s on 2026-10-25.
+- On `<compute-2>`, the instance now runs in the hypervisor; on `<compute-1>`, it is gone. On each compute (from
+  controller 1: `ssh -i ~/.ssh/quicklab_ed25519 ubuntu@<compute-address>`):
 
   ```bash
   sudo docker exec nova_libvirt virsh list --all
