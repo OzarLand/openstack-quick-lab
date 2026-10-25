@@ -32,7 +32,7 @@ console before you start. A variant for a personal machine with KVM, with no clo
 
 ```mermaid
 flowchart LR
-    cost["Your price per hour<br/>in config.env"] --> create["create.sh<br/>shows the cost, you confirm,<br/>then it creates the VMs"]
+    cost["Your price per hour<br/>in config.env"] --> create["create.sh<br/>shows the cost, asks,<br/>creates the VMs"]
     create --> deploy["deploy.sh<br/>installs OpenStack"]
     deploy --> ex["Exercises<br/>break and repair"]
     ex --> destroy["destroy.sh<br/>deletes everything"]
