@@ -5,6 +5,25 @@ purpose, shows you what an operator would see, and walks you through the repair 
 [openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks). The runbooks of exercises 1 to 7 were
 checked on a lab (`status: lab-verified`); exercises 8 and 9 use a runbook still marked `status: draft`.
 
+> **Why the exercises use `systemctl`, not `docker`, to stop a service**
+>
+> Kolla-Ansible gives each container a systemd unit, `/etc/systemd/system/kolla-<container>-container.service`
+> ([release note](https://github.com/openstack/kolla-ansible/blob/stable/2026.1/releasenotes/notes/add-systemd-container-control-b85dff9ec5fae313.yaml);
+> [the code that writes the unit](https://github.com/openstack/kolla-ansible/blob/stable/2026.1/ansible/module_utils/kolla_systemd_worker.py)). It is still the case in
+> 2026.1, the release of these labs.
+>
+> - The unit starts the container with `docker start -a <container>` and stops it with `docker stop`.
+> - With Kolla-Ansible's default `docker_restart_policy: "unless-stopped"`
+>   ([`ansible/group_vars/all/common.yml`](https://github.com/openstack/kolla-ansible/blob/stable/2026.1/ansible/group_vars/all/common.yml)), the unit gets `Restart=always`.
+> - So `docker stop <container>` alone is undone: systemd starts the container again. `systemctl stop
+>   kolla-<container>-container.service` keeps it stopped.
+> - The delay before systemd restarts it (`RestartSec`) comes from `docker_client_timeout`: one tenth of it, minus one
+>   second. It is 11 s with Kolla-Ansible's default of 120 s; these labs set 600 s, so about **59 s**: a container you
+>   stopped with `docker stop` comes back about a minute later.
+>
+> The exercises use `docker` only to look (`docker ps`, `docker exec`, `docker logs`). On a deployment without these
+> units (an older release, or another deployment tool), use that tool's own way to stop a service.
+
 | # | Exercise | Time | What you learn |
 |---|---|---|---|
 | 1 | [DHCP agents down](01-dhcp-agents-down.md) | 20 min | An instance can be `ACTIVE` and still have no address |
