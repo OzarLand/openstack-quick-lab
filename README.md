@@ -17,15 +17,15 @@ for a personal machine with KVM, with no cloud cost, is [wanted](https://github.
 >   a procedure before production.
 > - **What it costs:** one VM for about an hour. One full run measured on the reference cloud: about **0.05 EUR
 >   (0.19 TND) for 57 minutes**. The script shows the estimated cost per hour and asks before creating anything.
-> - **Multinode variant:** 3 VMs (1 controller, 2 computes), growing to 5 (3 controllers) with one setting, to
->   practise migration, a failed compute and, with 5 VMs, a failed controller; estimated at about 0.59 TND per hour
->   for 3 VMs and 0.98 TND for 5, to be measured.
+> - **Multinode variant (not available yet: scripts in progress):** 3 VMs (1 controller, 2 computes), growing to 5
+>   (3 controllers) with one setting, to practise migration, a failed compute and, with 5 VMs, a failed controller;
+>   estimated at about 0.59 TND per hour for 3 VMs and 0.98 TND for 5, to be measured.
 > - **The risk:** the VM costs money every hour it exists, until it is deleted. On a prepaid cloud, such as
 >   [Felcloud](https://felcloud.io/), the recommended starting point, spending cannot go beyond the credit loaded.
 >   On a pay-as-you-go cloud, set a budget alert first. One command deletes everything.
 > - **Who can run it:** anyone comfortable with a terminal and SSH; no OpenStack knowledge needed to start.
-> - **What it does not include:** high availability (except the multinode variant with 5 VMs), production use,
->   block storage (Cinder), load balancing (Octavia), or support. It is a learning lab, deleted after use.
+> - **What it does not include:** high availability, production use, block storage (Cinder), load balancing
+>   (Octavia), or support. It is a learning lab, deleted after use.
 
 ## Who this is for
 
@@ -63,7 +63,7 @@ describes. Each variant states the OpenStack and Kolla-Ansible releases its scri
 |---|---|---|---|
 | [`openstack-cloud`](variants/openstack-cloud/README.md) on **Felcloud** | [Felcloud](https://felcloud.io/), a prepaid cloud service built on OpenStack | Spending cannot exceed the credit loaded | Load only the credit you are ready to spend. [Felcloud's pricing page](https://felcloud.io/pricing) says: "Top up your balance and spend only what you loaded" (checked on 2026-10-23); billed per second (same page). At its listed prices on 2026-10-23, one full run (57 min) came to 0.19 TND (0.05 EUR), and each extra day the lab is left running costs 4.70 TND (1.37 EUR); with a floating IP, 0.20 TND and 5.06 TND (0.06 and 1.49 EUR): [details](variants/openstack-cloud/README.md#what-a-lab-cost-on-felcloud) |
 | [`openstack-cloud`](variants/openstack-cloud/README.md) on a **pay-as-you-go** OpenStack cloud | Any OpenStack cloud billed by usage | Billed for every hour the VM, its volumes and its floating IPs exist, until you delete them | **Set a budget alert** in your provider's console before launching, and delete the lab when you are done |
-| [`openstack-cloud-multinode`](variants/openstack-cloud-multinode/README.md), 3 or 5 VMs | Any OpenStack cloud with a quota of 12 vCPU and 48 GB of RAM (3 VMs) or 20 vCPU and 80 GB (5 VMs) | Three to five times the single-VM variant, every hour the VMs exist. Estimated on Felcloud at its listed prices of 2026-10-23: about 0.59 TND per hour (about 14 TND per day) for 3 VMs, 0.98 TND per hour (23.5 TND per day) for 5; measured figures to come: [details](variants/openstack-cloud-multinode/README.md#the-cost-risk-before-anything-else) | The same as for `openstack-cloud`, on the cloud you use: credit or budget alert first, and destroy the lab the same day |
+| [`openstack-cloud-multinode`](variants/openstack-cloud-multinode/README.md), 3 or 5 VMs | Any OpenStack cloud with a quota of 12 vCPU and 48 GB of RAM (3 VMs) or 20 vCPU and 80 GB (5 VMs) | Three to five times the single-VM variant, every hour the VMs exist. Estimated on Felcloud at its listed prices of 2026-10-23: about 0.59 TND per hour (about 14 TND per day) for 3 VMs, 0.98 TND per hour (23.5 TND per day) for 5; measured figures to come: [details](variants/openstack-cloud-multinode/README.md#the-cost-risk-before-anything-else) | **Not available yet: scripts in progress.** The guide describes the design; once the scripts are merged, the same as for `openstack-cloud`: credit or budget alert first, and destroy the lab the same day |
 | Personal machine | Your own computer or server, with hardware virtualisation | **No cloud cost** | Not written yet: [issue #5](https://github.com/OzarLand/openstack-quick-lab/issues/5); contributions welcome, see [CONTRIBUTING.md](CONTRIBUTING.md) |
 
 Felcloud is the variant recommended to start with, for one reason only: with a prepaid credit, a forgotten lab

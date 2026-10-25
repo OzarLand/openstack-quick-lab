@@ -82,7 +82,13 @@ The same safety rules as the [single-VM variant](../openstack-cloud/README.md):
 - **Nested virtualisation** on the hosting cloud, so that instances on the lab's computes run with KVM. Live migration
   between two computes works with `qemu` too, but is much slower.
 - **For the HA size**: the hosting cloud must let the controllers share a virtual IP (allowed address pairs on their
-  ports) and pass VRRP between them. The pattern below explains how to check it before you start.
+  ports) and pass VRRP (IP protocol 112) between them. Check it before you pay for 5 VMs: the pattern's
+  [context](https://github.com/OzarLand/kolla-ansible-deployment-patterns/blob/main/topologies/three-controllers-two-computes-nested-in-an-openstack-cloud.md#context)
+  lists what was measured on the hosting cloud before designing the lab, and its
+  [network design](https://github.com/OzarLand/kolla-ansible-deployment-patterns/blob/main/topologies/three-controllers-two-computes-nested-in-an-openstack-cloud.md#network-design)
+  shows how the virtual IP and VRRP are set up. If your provider's documentation does not say whether allowed address
+  pairs are available, `openstack extension list --network | grep -i allowed-address-pairs` on your account tells
+  you; whether VRRP passes, only your provider or a test between two VMs can tell.
 
 ## Steps
 
