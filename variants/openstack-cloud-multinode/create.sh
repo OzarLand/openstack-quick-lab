@@ -34,7 +34,13 @@ read -r EXT_GW EXT_PREFIX < <(python3 -c "import ipaddress as i; n=i.ip_network(
 mkdir -p "$STATE_DIR"; touch "$LOG"
 os token issue -f value -c expires >/dev/null || die "Cannot authenticate with OS_CLOUD=$OS_CLOUD."
 for n in "${NODES[@]}"; do os server show "$n" >/dev/null 2>&1 && die "A server named $n already exists. Destroy the lab first, or change LAB."; done
-os network show "${LABNAME}-ext" >/dev/null 2>&1 && die "A network named ${LABNAME}-ext already exists. Run ./destroy.sh first, or change LAB."
+# Resources left by a previous run that stopped half-way (all named "${LABNAME}-..."): create.sh would fail on them
+# with a raw client error.
+names() { local out; out=$(os "$@" -f value -c Name 2>&1) || die "Could not list the project's resources ($*): $(printf '%s' "$out" | tail -1)"; printf '%s\n' "$out"; }
+L_KEYS=$(names keypair list); L_SGS=$(names security group list); L_PORTS=$(names port list)
+L_NETS=$(names network list); L_VOLS=$(names volume list)
+LEFTOVERS=$(printf '%s\n' "$L_KEYS" "$L_SGS" "$L_PORTS" "$L_NETS" "$L_VOLS" | awk -v p="${LABNAME}-" 'index($1, p) == 1')
+[ -z "$LEFTOVERS" ] || die "Resources of a previous run of $LABNAME still exist ($(echo $LEFTOVERS)): run ./destroy.sh first."
 os network show "$NETWORK" >/dev/null || die "Network $NETWORK not found."
 [ -n "$FLOATING_NETWORK" ] && { os network show "$FLOATING_NETWORK" >/dev/null || die "Network $FLOATING_NETWORK not found."; }
 
@@ -144,6 +150,6 @@ if [ -n "$FLOATING_NETWORK" ]; then
 fi
 save CTL_ADDRESS "$CTL_ADDRESS"
 say "Waiting for SSH on $CTL1 ($CTL_ADDRESS)"
-for _ in $(seq 1 60); do ssh_ctl true 2>/dev/null && break; sleep 5; done
+END=$(( $(date +%s)+300 )); until ssh_ctl true 2>/dev/null; do [ "$(date +%s)" -lt "$END" ] || die "VM unreachable: $CTL1 does not answer SSH on $CTL_ADDRESS after 5 minutes. Check FLOATING_NETWORK and SSH_FROM in config.env, then run ./destroy.sh"; sleep 5; done
 ssh_ctl 'cloud-init status --wait >/dev/null; echo "$(hostname): $(nproc) vCPU, $(free -g | awk "/Mem/{print \$2}") GB RAM, $(df -h / | awk "NR==2{print \$2}") disk"' | tee -a "$LOG"
 say "Created in $(( $(date +%s)-T0 )) s. Next: ./deploy.sh   (and ./destroy.sh when you are done)"
