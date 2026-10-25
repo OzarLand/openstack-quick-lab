@@ -1,11 +1,11 @@
 # Exercise 7. A compute goes down: fence it before you evacuate
 
-> **Multinode variant** only: it needs two computes. **Not yet run on a lab**: the commands and what you should see
-> are written from the runbook and Nova's documentation, and are checked when the lab confirms them.
+> **Multinode variant** only: it needs two computes. Run on a lab on 2026-10-25 (multinode variant, 1 controller +
+> 2 computes): see the [lab review](https://github.com/OzarLand/openstack-quick-lab/pull/10#issuecomment-6397487220).
 
 **Goal:** see a compute reported `down` while its instances may still be running, make sure it is really off
 (fence it), and only then rebuild its instances on the other compute (evacuate).
-**Time:** about 30 minutes (estimate, not yet run).
+**Time:** about 30 minutes (about 15 minutes of commands and waiting on the lab, plus reading).
 **Runbook:** [A compute host has failed: fence it before you evacuate](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/recovery/compute-host-failure-fence-before-evacuate.md)
 
 ## Before you start
@@ -54,7 +54,7 @@ ssh -i ~/.ssh/quicklab_ed25519 ubuntu@<compute-1-address>
 On `<compute-1>` (logged in from controller 1, as above):
 
 ```bash
-sudo systemctl stop kolla-nova_compute-container.service
+sudo systemctl stop kolla-nova_compute-container.service    # takes about a minute to return
 ```
 
 ## 2. What you should see
@@ -80,23 +80,33 @@ Follow the runbook from its **Quick checks**. Its order is the point of this exe
 
 1. **Tell a dead host from a dead agent.** Here the host answers and its instances run: only the agent is down. On a
    real platform, this is where you would just start the agent again (as in [exercise 3](03-nova-compute-down.md)).
-   Here, treat the compute as failed, and go on.
-2. **Fence it before anything else.** Make sure the compute cannot run its instances any more. In the hosting
-   terminal, power off its VM, the way a power controller would switch off a physical server:
+   Here, treat the compute as failed, and go on. Two of the runbook's quick checks need adapting on this lab:
+   - its volume check (`openstack volume list …`) prints a block-storage error: the lab has no Cinder, skip it;
+   - its `ssh <host> uptime` fails with `Host key verification failed`, because controller 1 knows the computes by
+     address. Use the lab's key and the address instead:
 
-   > 🛑 **Destructive.** Powers off `<compute-1-vm>`: every instance on it stops at once, without a clean shutdown.
-   > Disposable lab only.
+     ```bash
+     ssh -i ~/.ssh/quicklab_ed25519 ubuntu@<compute-1-address> uptime
+     ```
+
+2. **Fence it before anything else.** Make sure the compute cannot run its instances any more. In the hosting
+   terminal, stop its VM. On the lab this is a clean shutdown of the VM, which takes about a minute and a half; a
+   power controller would cut a physical server at once, but the result you check is the same: the host is off.
+
+   > 🛑 **Destructive.** Shuts down `<compute-1-vm>`: every instance on it stops. Disposable lab only.
 
    ```bash
    openstack server stop <compute-1-vm>
-   openstack server show <compute-1-vm> -c status    # SHUTOFF before you go on
+   openstack server show <compute-1-vm> -c status    # SHUTOFF before you go on (about 80 s on the lab)
    ```
 
-3. **Tell Nova the compute is down**, so that it does not wait for it, as the runbook's **Resolution** shows:
+3. **Take the compute out of scheduling and tell Nova it is down**, so that nothing new lands on it and Nova does not
+   wait for it, as the runbook's **Resolution** shows. It stays disabled until the host has been looked at:
 
-   > ⚠️ **State-changing.** Marks `<compute-1>` as forced down in Nova.
+   > ⚠️ **State-changing.** Disables `<compute-1>` and marks it as forced down in Nova.
 
    ```bash
+   openstack compute service set --disable --disable-reason "host failed" <compute-1> nova-compute
    openstack compute service set --down <compute-1> nova-compute
    ```
 
@@ -104,6 +114,16 @@ Follow the runbook from its **Quick checks**. Its order is the point of this exe
 
    > 🛑 **Destructive.** Evacuation rebuilds `ex7-test` on `<compute-2>` from its image: on this lab, without shared
    > storage, whatever was on its disk is lost. Disposable lab only.
+
+   The evacuated instance comes back **`SHUTOFF`**, not `ACTIVE`: the client uses compute API microversion 2.95 or
+   later, which keeps an evacuated instance stopped, as the runbook says. Check it, then start it:
+
+   > ⚠️ **State-changing.** Starts `ex7-test` on `<compute-2>`.
+
+   ```bash
+   openstack server show ex7-test -c status -c OS-EXT-SRV-ATTR:host    # SHUTOFF, on <compute-2>
+   openstack server start ex7-test
+   ```
 
 ## 4. Check
 
@@ -115,22 +135,25 @@ openstack server migration list --server ex7-test                    # the evacu
 ```
 
 Then bring `<compute-1>` back, as the runbook's last part shows: start its VM in the hosting terminal, check that
-`nova-compute` starts and removes the old copy of `ex7-test` (`virsh list --all` on `<compute-1>` no longer shows it),
-and only then lift the forced down.
+`nova-compute` starts and removes the old copy of `ex7-test` (`virsh list --all` on `<compute-1>` no longer shows it;
+on the lab, `nova-compute` reported again about 3.5 minutes after the VM was started), and only then lift the forced
+down and enable the compute again.
 
 > ⚠️ **State-changing.** Starts `<compute-1-vm>` and puts `<compute-1>` back in service.
 
 ```bash
 openstack server start <compute-1-vm>                        # hosting terminal
 openstack compute service set --up <compute-1> nova-compute  # lab terminal, once the old copy is gone
-openstack compute service list --service nova-compute        # lab terminal: <compute-1> up again
+openstack compute service set --enable <compute-1> nova-compute
+openstack compute service list --service nova-compute        # lab terminal: <compute-1> enabled and up again
 ```
 
 ## 5. Clean up
 
 If you stopped half-way: in the hosting terminal, start `<compute-1-vm>` if it is `SHUTOFF`; on `<compute-1>`, start
 `nova-compute` if it is stopped (`sudo systemctl start kolla-nova_compute-container.service`); in the lab terminal,
-lift the forced down if you set it (`openstack compute service set --up <compute-1> nova-compute`). Then delete the test instance:
+lift the forced down and the disable if you set them (`openstack compute service set --up <compute-1> nova-compute`,
+then `openstack compute service set --enable <compute-1> nova-compute`). Then delete the test instance:
 
 ```bash
 openstack server delete --wait ex7-test

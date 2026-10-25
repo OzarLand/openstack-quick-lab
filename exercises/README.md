@@ -17,8 +17,8 @@ checked on a lab (`status: lab-verified`); exercises 8 and 9 use a runbook still
 ### Multinode variant
 
 These three need two computes: run them on the
-[multinode variant](../variants/openstack-cloud-multinode/README.md), not on the all-in-one lab. They are **not yet
-run on a lab**; their times are estimates until they are. Exercises 8 and 9 use a runbook still marked
+[multinode variant](../variants/openstack-cloud-multinode/README.md), not on the all-in-one lab. They were
+[run on a lab](https://github.com/OzarLand/openstack-quick-lab/pull/10#issuecomment-6397487220) on 2026-10-25 (multinode variant, 1 controller + 2 computes). Exercises 8 and 9 use a runbook still marked
 `status: draft`.
 
 | # | Exercise | Time | What you learn |
