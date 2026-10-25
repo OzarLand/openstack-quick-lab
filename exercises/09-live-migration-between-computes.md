@@ -6,8 +6,8 @@
 **Goal:** move a running instance from one compute to the other while you ping it, and measure what its users would
 notice.
 **Time:** about 20 minutes (estimate, not yet run).
-**Runbook:** the runbook on moving instances off a host, in the
-[`migration/` section of openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks/tree/main/migration)
+**Runbook:** [Moving instances off a host for maintenance](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/migration/moving-instances-off-a-host-for-maintenance.md) (`status: draft`: not yet
+checked on a lab; it also covers live migration)
 
 ## Before you start
 

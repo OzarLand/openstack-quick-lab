@@ -6,8 +6,7 @@
 **Goal:** see a compute reported `down` while its instances may still be running, make sure it is really off
 (fence it), and only then rebuild its instances on the other compute (evacuate).
 **Time:** about 30 minutes (estimate, not yet run).
-**Runbook:** the runbook on a compute host failure, in the
-[`recovery/` section of openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks/tree/main/recovery)
+**Runbook:** [A compute host has failed: fence it before you evacuate](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/recovery/compute-host-failure-fence-before-evacuate.md)
 
 ## Before you start
 
@@ -84,10 +83,13 @@ Follow the runbook from its **Quick checks**. Its order is the point of this exe
    openstack server show <compute-1-vm> -c status    # SHUTOFF before you go on
    ```
 
-3. **Tell Nova the compute is down**, so that it does not wait for it, as the runbook's **Resolution** shows (forced
-   down on the `nova-compute` service of `<compute-1>`).
+3. **Tell Nova the compute is down**, so that it does not wait for it, as the runbook's **Resolution** shows:
 
    > ⚠️ **State-changing.** Marks `<compute-1>` as forced down in Nova.
+
+   ```bash
+   openstack compute service set --down <compute-1> nova-compute
+   ```
 
 4. **Evacuate** its instances to `<compute-2>`, following the runbook.
 
@@ -111,6 +113,7 @@ and only then lift the forced down.
 
 ```bash
 openstack server start <compute-1-vm>                        # hosting terminal
+openstack compute service set --up <compute-1> nova-compute  # lab terminal, once the old copy is gone
 openstack compute service list --service nova-compute        # lab terminal: <compute-1> up again
 ```
 
@@ -118,7 +121,7 @@ openstack compute service list --service nova-compute        # lab terminal: <co
 
 If you stopped half-way: in the hosting terminal, start `<compute-1-vm>` if it is `SHUTOFF`; on `<compute-1>`, start
 `nova-compute` if it is stopped (`sudo systemctl start kolla-nova_compute-container.service`); in the lab terminal,
-lift the forced down if you set it, as the runbook shows. Then delete the test instance:
+lift the forced down if you set it (`openstack compute service set --up <compute-1> nova-compute`). Then delete the test instance:
 
 ```bash
 openstack server delete --wait ex7-test
