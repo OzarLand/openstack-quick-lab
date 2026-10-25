@@ -32,7 +32,7 @@ console before you start. A variant for a personal machine with KVM, with no clo
 
 ```mermaid
 flowchart LR
-    cost["Estimate the cost<br/>and confirm"] --> create["create.sh<br/>creates the VMs"]
+    cost["Your price per hour<br/>in config.env"] --> create["create.sh<br/>shows the cost, you confirm,<br/>then it creates the VMs"]
     create --> deploy["deploy.sh<br/>installs OpenStack"]
     deploy --> ex["Exercises<br/>break and repair"]
     ex --> destroy["destroy.sh<br/>deletes everything"]
@@ -74,17 +74,17 @@ Every exercise ends with the same reminder: **Done for the day? Destroy the lab:
 Each exercise breaks one thing on purpose and repairs it with a runbook from
 [openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks). [All the exercises](exercises/README.md).
 
-| # | Exercise | Needs |
-|---|---|---|
-| 1 | [DHCP agents down: a new instance gets no address](exercises/01-dhcp-agents-down.md) | Single VM |
-| 2 | [Metadata agents down: a new instance gets no SSH key](exercises/02-metadata-agents-down.md) | Single VM |
-| 3 | [nova-compute down: instances keep running](exercises/03-nova-compute-down.md) | Single VM |
-| 4 | [Restarting nova_libvirt without stopping instances](exercises/04-restart-nova-libvirt.md) | Single VM |
-| 5 | [Restarting the Open vSwitch agent without cutting the network](exercises/05-restart-ovs-agent.md) | Single VM |
-| 6 | [An instance unreachable from outside](exercises/06-instance-unreachable-from-outside.md) | Single VM |
-| 7 | [A compute goes down: fence it before you evacuate](exercises/07-compute-down-fence-before-evacuate.md) | Multinode |
-| 8 | [Drain a compute for planned maintenance](exercises/08-drain-a-compute-for-maintenance.md) | Multinode |
-| 9 | [Live migration between the two computes](exercises/09-live-migration-between-computes.md) | Multinode |
+| # | Exercise | Needs | Runbook |
+|---|---|---|---|
+| 1 | [DHCP agents down: a new instance gets no address](exercises/01-dhcp-agents-down.md) | Single VM | [New instance gets no IP](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/networking/new-instance-gets-no-ip-dhcp-agents-down.md) |
+| 2 | [Metadata agents down: a new instance gets no SSH key](exercises/02-metadata-agents-down.md) | Single VM | [New instance boots without metadata](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/networking/new-instance-boots-without-metadata.md) |
+| 3 | [nova-compute down: instances keep running](exercises/03-nova-compute-down.md) | Single VM | [nova-compute down, instances still running](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/recovery/nova-compute-down-instances-still-running.md) |
+| 4 | [Restarting nova_libvirt without stopping instances](exercises/04-restart-nova-libvirt.md) | Single VM | [Restarting nova_libvirt does not stop instances](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/lifecycle/restarting-nova-libvirt-does-not-stop-instances.md) |
+| 5 | [Restarting the Open vSwitch agent without cutting the network](exercises/05-restart-ovs-agent.md) | Single VM | [Restarting the OVS agent does not cut instances](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/networking/restarting-the-ovs-agent-does-not-cut-instances.md) |
+| 6 | [An instance unreachable from outside](exercises/06-instance-unreachable-from-outside.md) | Single VM | [Instance unreachable from outside](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/networking/instance-unreachable-from-outside.md) |
+| 7 | [A compute goes down: fence it before you evacuate](exercises/07-compute-down-fence-before-evacuate.md) | Multinode | [Fence it before you evacuate](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/recovery/compute-host-failure-fence-before-evacuate.md) |
+| 8 | [Drain a compute for planned maintenance](exercises/08-drain-a-compute-for-maintenance.md) | Multinode | [Moving instances off a host for maintenance (draft)](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/migration/moving-instances-off-a-host-for-maintenance.md) |
+| 9 | [Live migration between the two computes](exercises/09-live-migration-between-computes.md) | Multinode | [Moving instances off a host for maintenance (draft)](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/migration/moving-instances-off-a-host-for-maintenance.md) |
 
 > **In one minute (for managers)**
 >

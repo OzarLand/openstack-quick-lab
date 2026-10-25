@@ -5,6 +5,18 @@ purpose, shows you what an operator would see, and walks you through the repair 
 [openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks). The runbooks of exercises 1 to 7 were
 checked on a lab (`status: lab-verified`); exercises 8 and 9 use a runbook still marked `status: draft`.
 
+## How an exercise works
+
+```mermaid
+flowchart LR
+    brk["Break<br/>something"] --> see["See the<br/>symptom"]
+    see --> rb["Follow the<br/>runbook"]
+    rb --> fix["Repair"]
+    fix --> ok["Verify"]
+```
+
+Every page follows these steps in order, then cleans up what it created and reminds you to delete the lab.
+
 > **Why the exercises use `systemctl`, not `docker`, to stop a service**
 >
 > Kolla-Ansible gives each container a systemd unit, `/etc/systemd/system/kolla-<container>-container.service`
