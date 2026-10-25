@@ -14,8 +14,9 @@ source ~/kolla-venv/bin/activate; . /etc/kolla/admin-openrc.sh; openstack server
 ./destroy.sh                                             # back on your computer: deletes everything, after asking (under 1 min)
 ```
 
-- **`SSH_FROM`**: the address allowed to SSH to the VM. With a floating IP (`FLOATING_NETWORK` set), your own public
-  address. Without one, the address of the host you connect from, in the same network (a jump host).
+- **`SSH_FROM`**: the address allowed to SSH to the VM, as a CIDR: one address is a `/32` (for example
+  `198.51.100.7/32`). With a floating IP (`FLOATING_NETWORK` set), your own public address. Without one, the address
+  of the host you connect from, in the same network (a jump host). `create.sh` refuses anything wider than a `/16`.
 - **tmux**: `deploy.sh` runs on your computer and drives the VM over SSH for about an hour. Run it inside `tmux` (or
   `screen`) so that a closed terminal or a dropped connection does not stop it. If it stops, run it again: it resumes.
 - **Time**: plan about 75 minutes before your first exercise: 56 minutes measured for `create.sh` and `deploy.sh`,
