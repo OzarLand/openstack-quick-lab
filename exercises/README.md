@@ -4,8 +4,20 @@ Six short exercises on the all-in-one lab, three on the multinode variant and tw
 one breaks one thing on purpose, shows you what an operator would see, and walks you through the repair with a
 runbook from [openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks) (exercises 10 and 11 use
 pages of [kolla-ansible-deployment-patterns](https://github.com/OzarLand/kolla-ansible-deployment-patterns)
-instead). The runbooks of exercises 1 to 7 were
-checked on a lab (`status: lab-verified`); exercises 8 and 9 use a runbook still marked `status: draft`.
+instead). The runbooks of exercises 1 to 9 were
+checked on a lab (`status: lab-verified`).
+
+## How an exercise works
+
+```mermaid
+flowchart LR
+    brk["Break<br/>something"] --> see["See the<br/>symptom"]
+    see --> rb["Follow the<br/>runbook"]
+    rb --> fix["Repair"]
+    fix --> ok["Verify"]
+```
+
+Most pages follow these steps in order, then clean up what they created and remind you to delete the lab.
 
 > **Why the exercises use `systemctl`, not `docker`, to stop a service**
 >
@@ -40,8 +52,8 @@ checked on a lab (`status: lab-verified`); exercises 8 and 9 use a runbook still
 
 These three need two computes: run them on the
 [multinode variant](../variants/openstack-cloud-multinode/README.md), not on the all-in-one lab. They were
-[run on a lab](https://github.com/OzarLand/openstack-quick-lab/pull/10#issuecomment-6397487220) on 2026-10-25 (multinode variant, 1 controller + 2 computes). Exercises 8 and 9 use a runbook still marked
-`status: draft`.
+[run on a lab](https://github.com/OzarLand/openstack-quick-lab/pull/10#issuecomment-6397487220) on 2026-10-25 (multinode variant, 1 controller + 2 computes). The runbook of exercises 8 and 9 is now
+`status: lab-verified`.
 
 | # | Exercise | Time | What you learn |
 |---|---|---|---|

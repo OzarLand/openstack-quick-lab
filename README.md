@@ -12,7 +12,7 @@ On a prepaid cloud you cannot spend more than your credit; on any other cloud, s
 
 | | [Single VM](variants/openstack-cloud/README.md) (`openstack-cloud`) | [Multinode](variants/openstack-cloud-multinode/README.md) (`openstack-cloud-multinode`) |
 |---|---|---|
-| **What you can practise** | The core services: DHCP, metadata, Nova, Open vSwitch, security groups and floating IPs (exercises 1 to 6) | 3 VMs: live migration, a failed compute, host maintenance (exercises 7 to 9). 5 VMs: also a failed controller, Galera and RabbitMQ, VIP failover |
+| **What you can practise** | The core services: DHCP, metadata, Nova, Open vSwitch, security groups and floating IPs (exercises 1 to 6) | 3 VMs: live migration, a failed compute, host maintenance (exercises 7 to 9). 5 VMs: also a failed controller, Galera and RabbitMQ, VIP failover (exercises 10 and 11) |
 | **VMs and quota** | 1 VM: 4 vCPU, 16 GB RAM, 50 GB disk | 3 VMs: 12 vCPU, 32 GB RAM. 5 VMs (`CONTROLLERS="3"`): 20 vCPU, 64 GB RAM |
 | **Time** | About 1 hour (57 min measured, `create.sh` to `destroy.sh`) | 3 VMs: 65 min measured, `create.sh` to `destroy.sh`. 5 VMs: 73 min measured, `create.sh` to the end of `deploy.sh` |
 | **Cost of one run** | 0.19 TND (0.05 EUR); 0.20 TND (0.06 EUR) with a floating IP | 3 VMs: 0.52 TND (0.15 EUR). 5 VMs: 1.05 TND (0.31 EUR) to build the lab |
@@ -32,7 +32,7 @@ console before you start. A variant for a personal machine with KVM, with no clo
 
 ```mermaid
 flowchart LR
-    cost["Estimate the cost<br/>and confirm"] --> create["create.sh<br/>creates the VMs"]
+    cost["Your price per hour<br/>in config.env"] --> create["create.sh<br/>shows the cost, asks,<br/>creates the VMs"]
     create --> deploy["deploy.sh<br/>installs OpenStack"]
     deploy --> ex["Exercises<br/>break and repair"]
     ex --> destroy["destroy.sh<br/>deletes everything"]
@@ -72,19 +72,22 @@ Every exercise ends with the same reminder: **Done for the day? Destroy the lab:
 ## Exercises
 
 Each exercise breaks one thing on purpose and repairs it with a runbook from
-[openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks). [All the exercises](exercises/README.md).
+[openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks), or, for 10 and 11, a page of
+[kolla-ansible-deployment-patterns](https://github.com/OzarLand/kolla-ansible-deployment-patterns). [All the exercises](exercises/README.md).
 
-| # | Exercise | Needs |
-|---|---|---|
-| 1 | [DHCP agents down: a new instance gets no address](exercises/01-dhcp-agents-down.md) | Single VM |
-| 2 | [Metadata agents down: a new instance gets no SSH key](exercises/02-metadata-agents-down.md) | Single VM |
-| 3 | [nova-compute down: instances keep running](exercises/03-nova-compute-down.md) | Single VM |
-| 4 | [Restarting nova_libvirt without stopping instances](exercises/04-restart-nova-libvirt.md) | Single VM |
-| 5 | [Restarting the Open vSwitch agent without cutting the network](exercises/05-restart-ovs-agent.md) | Single VM |
-| 6 | [An instance unreachable from outside](exercises/06-instance-unreachable-from-outside.md) | Single VM |
-| 7 | [A compute goes down: fence it before you evacuate](exercises/07-compute-down-fence-before-evacuate.md) | Multinode |
-| 8 | [Drain a compute for planned maintenance](exercises/08-drain-a-compute-for-maintenance.md) | Multinode |
-| 9 | [Live migration between the two computes](exercises/09-live-migration-between-computes.md) | Multinode |
+| # | Exercise | Needs | Runbook |
+|---|---|---|---|
+| 1 | [DHCP agents down: a new instance gets no address](exercises/01-dhcp-agents-down.md) | Single VM | [New instance gets no IP](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/networking/new-instance-gets-no-ip-dhcp-agents-down.md) |
+| 2 | [Metadata agents down: a new instance gets no SSH key](exercises/02-metadata-agents-down.md) | Single VM | [New instance boots without metadata](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/networking/new-instance-boots-without-metadata.md) |
+| 3 | [nova-compute down: instances keep running](exercises/03-nova-compute-down.md) | Single VM | [nova-compute down, instances still running](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/recovery/nova-compute-down-instances-still-running.md) |
+| 4 | [Restarting nova_libvirt without stopping instances](exercises/04-restart-nova-libvirt.md) | Single VM | [Restarting nova_libvirt does not stop instances](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/lifecycle/restarting-nova-libvirt-does-not-stop-instances.md) |
+| 5 | [Restarting the Open vSwitch agent without cutting the network](exercises/05-restart-ovs-agent.md) | Single VM | [Restarting the OVS agent does not cut instances](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/networking/restarting-the-ovs-agent-does-not-cut-instances.md) |
+| 6 | [An instance unreachable from outside](exercises/06-instance-unreachable-from-outside.md) | Single VM | [Instance unreachable from outside](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/networking/instance-unreachable-from-outside.md) |
+| 7 | [A compute goes down: fence it before you evacuate](exercises/07-compute-down-fence-before-evacuate.md) | Multinode | [Fence it before you evacuate](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/recovery/compute-host-failure-fence-before-evacuate.md) |
+| 8 | [Drain a compute for planned maintenance](exercises/08-drain-a-compute-for-maintenance.md) | Multinode | [Moving instances off a host for maintenance](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/migration/moving-instances-off-a-host-for-maintenance.md) |
+| 9 | [Live migration between the two computes](exercises/09-live-migration-between-computes.md) | Multinode | [Moving instances off a host for maintenance](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/migration/moving-instances-off-a-host-for-maintenance.md) |
+| 10 | [Lose one controller: what keeps working](exercises/10-lose-one-controller.md) | Multinode, 3 controllers | Pattern: [three controllers, two computes](https://github.com/OzarLand/kolla-ansible-deployment-patterns/blob/main/topologies/three-controllers-two-computes-nested-in-an-openstack-cloud.md) |
+| 11 | [Lose two controllers: quorum lost, and recovered](exercises/11-lose-two-controllers-quorum.md) | Multinode, 3 controllers | Procedure: [MariaDB cluster recovery](https://github.com/OzarLand/kolla-ansible-deployment-patterns/blob/main/deployment-errors/unattended-upgrades-during-deploy-breaks-the-mariadb-cluster.md#recover-the-failed-deploy) |
 
 > **In one minute (for managers)**
 >
