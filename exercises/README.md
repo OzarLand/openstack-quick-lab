@@ -18,8 +18,9 @@ checked on a lab (`status: lab-verified`); exercises 8 and 9 use a runbook still
 > - So `docker stop <container>` alone is undone: systemd starts the container again. `systemctl stop
 >   kolla-<container>-container.service` keeps it stopped.
 > - The delay before systemd restarts it (`RestartSec`) comes from `docker_client_timeout`: one tenth of it, minus one
->   second. It is 11 s with Kolla-Ansible's default of 120 s; these labs set 600 s, so about **59 s**: a container you
->   stopped with `docker stop` comes back about a minute later.
+>   second. It is 11 s with Kolla-Ansible's default of 120 s; these labs set 600 s, so **59 s**. On the 5-VM lab, a
+>   `neutron_dhcp_agent` stopped with `docker stop` was running again about 70 s later
+>   ([measurement](https://github.com/OzarLand/openstack-quick-lab/pull/13#issuecomment-6398277862)).
 >
 > The exercises use `docker` only to look (`docker ps`, `docker exec`, `docker logs`). On a deployment without these
 > units (an older release, or another deployment tool), use that tool's own way to stop a service.
