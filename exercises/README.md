@@ -1,8 +1,10 @@
 # Exercises
 
-Six short exercises on the all-in-one lab, and three on the multinode variant. Each one breaks one thing on
-purpose, shows you what an operator would see, and walks you through the repair with a runbook from
-[openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks). The runbooks of exercises 1 to 7 were
+Six short exercises on the all-in-one lab, three on the multinode variant and two on its 3-controller size. Each
+one breaks one thing on purpose, shows you what an operator would see, and walks you through the repair with a
+runbook from [openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks) (exercises 10 and 11 use
+pages of [kolla-ansible-deployment-patterns](https://github.com/OzarLand/kolla-ansible-deployment-patterns)
+instead). The runbooks of exercises 1 to 7 were
 checked on a lab (`status: lab-verified`); exercises 8 and 9 use a runbook still marked `status: draft`.
 
 > **Why the exercises use `systemctl`, not `docker`, to stop a service**
@@ -46,6 +48,17 @@ These three need two computes: run them on the
 | 7 | [A compute goes down: fence it before you evacuate](07-compute-down-fence-before-evacuate.md) | 30 min | Why a compute must be off for sure before its instances are rebuilt elsewhere |
 | 8 | [Drain a compute for planned maintenance](08-drain-a-compute-for-maintenance.md) | 30 min | Disable, move the instances away, work, enable: maintenance without downtime |
 | 9 | [Live migration between the two computes](09-live-migration-between-computes.md) | 20 min | What moving a running instance costs its users, measured with a ping |
+
+### Multinode variant, 3 controllers
+
+These two need the 5-VM size of the multinode variant (`CONTROLLERS="3"`). They were
+[run on a lab](https://github.com/OzarLand/openstack-quick-lab/pull/15#issuecomment-6399273095) on 2026-10-25
+(multinode variant, 3 controllers + 2 computes).
+
+| # | Exercise | Time | What you learn |
+|---|---|---|---|
+| 10 | [Lose one controller: what keeps working](10-lose-one-controller.md) | 40 min | The VIP moves, two of three is still a quorum, a hung controller costs more than a dead one, a controller rejoins |
+| 11 | [Lose two controllers: quorum lost, and recovered](11-lose-two-controllers-quorum.md) | 30 to 45 min | Why a minority stops serving, when Galera recovers by itself, and how `mariadb-recovery` rebuilds the cluster when it does not |
 
 ## Before every exercise
 
