@@ -1,9 +1,9 @@
 # Exercises
 
-Six short exercises on the all-in-one lab. Each one breaks one thing on purpose, shows you what an operator would
-see, and walks you through the repair with a runbook from
-[openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks). Every runbook used here was checked on a
-lab (`status: lab-verified`).
+Six short exercises on the all-in-one lab, and three on the multinode variant. Each one breaks one thing on
+purpose, shows you what an operator would see, and walks you through the repair with a runbook from
+[openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks). The runbooks of exercises 1 to 7 were
+checked on a lab (`status: lab-verified`); exercises 8 and 9 use a runbook still marked `status: draft`.
 
 | # | Exercise | Time | What you learn |
 |---|---|---|---|
@@ -13,6 +13,19 @@ lab (`status: lab-verified`).
 | 4 | [Restarting nova_libvirt](04-restart-nova-libvirt.md) | 10 min | A restart that looks risky, and why it is not |
 | 5 | [Restarting the Open vSwitch agent](05-restart-ovs-agent.md) | 10 min | The agent programs the network; it does not carry the traffic |
 | 6 | [Instance unreachable from outside](06-instance-unreachable-from-outside.md) | 20 min | Security groups and floating IPs, checked in order |
+
+### Multinode variant
+
+These three need two computes: run them on the
+[multinode variant](../variants/openstack-cloud-multinode/README.md), not on the all-in-one lab. They are **not yet
+run on a lab**; their times are estimates until they are. Exercises 8 and 9 use a runbook still marked
+`status: draft`.
+
+| # | Exercise | Time | What you learn |
+|---|---|---|---|
+| 7 | [A compute goes down: fence it before you evacuate](07-compute-down-fence-before-evacuate.md) | 30 min | Why a compute must be off for sure before its instances are rebuilt elsewhere |
+| 8 | [Drain a compute for planned maintenance](08-drain-a-compute-for-maintenance.md) | 30 min | Disable, move the instances away, work, enable: maintenance without downtime |
+| 9 | [Live migration between the two computes](09-live-migration-between-computes.md) | 20 min | What moving a running instance costs its users, measured with a ping |
 
 ## Before every exercise
 

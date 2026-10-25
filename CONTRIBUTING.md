@@ -63,7 +63,8 @@ sends readers to the runbook; it does not copy it.
 
 Follow the structure of the existing exercises: goal, time, before you start, break it (with its ⚠️ warning), what
 you should see, diagnose and repair with the runbook, check, clean up, and the reminder to delete the lab. Every
-exercise must work on every variant.
+exercise works on every variant, unless it needs what only one variant has (for example two computes); it then says
+at the top which variant it needs.
 
 If an exercise shows the runbook is wrong or incomplete, open an issue or a pull request on the runbook too.
 
