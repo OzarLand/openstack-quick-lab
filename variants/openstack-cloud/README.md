@@ -6,12 +6,20 @@ One command deletes it all.
 ## Quick start
 
 ```bash
-cp config.example.env config.env && $EDITOR config.env   # OS_CLOUD, NETWORK, SSH_FROM, COST_PER_HOUR
+cp config.example.env config.env && $EDITOR config.env   # OS_CLOUD, NETWORK, SSH_FROM, COST_PER_HOUR; FLOATING_NETWORK if you use one
 ./create.sh                                              # shows the cost, asks, creates the VM (3 min)
-./deploy.sh                                              # deploys OpenStack on it (53 min)
-ssh -i .state/quicklab-1/id_ed25519 ubuntu@<vm-address>  # the lab is yours: openstack server list
-./destroy.sh                                             # deletes everything, after asking (under 1 min)
+./deploy.sh                                              # deploys OpenStack on it (53 min); run it inside tmux
+ssh -i .state/quicklab-1/id_ed25519 ubuntu@<vm-address>  # then, on the VM:
+source ~/kolla-venv/bin/activate; . /etc/kolla/admin-openrc.sh; openstack server list
+./destroy.sh                                             # back on your computer: deletes everything, after asking (under 1 min)
 ```
+
+- **`SSH_FROM`**: the address allowed to SSH to the VM. With a floating IP (`FLOATING_NETWORK` set), your own public
+  address. Without one, the address of the host you connect from, in the same network (a jump host).
+- **tmux**: `deploy.sh` runs on your computer and drives the VM over SSH for about an hour. Run it inside `tmux` (or
+  `screen`) so that a closed terminal or a dropped connection does not stop it. If it stops, run it again: it resumes.
+- **Time**: plan about 75 minutes before your first exercise: 56 minutes measured for `create.sh` and `deploy.sh`,
+  plus filling in `config.env` and logging in.
 
 Read [the cost risk](#the-cost-risk) first. The rest of this page is the detail.
 

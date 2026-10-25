@@ -14,8 +14,8 @@ On a prepaid cloud you cannot spend more than your credit; on any other cloud, s
 |---|---|---|
 | **What you can practise** | The core services: DHCP, metadata, Nova, Open vSwitch, security groups and floating IPs (exercises 1 to 6) | 3 VMs: live migration, a failed compute, host maintenance (exercises 7 to 9). 5 VMs: also a failed controller, Galera and RabbitMQ, VIP failover (exercises 10 and 11) |
 | **VMs and quota** | 1 VM: 4 vCPU, 16 GB RAM, 50 GB disk | 3 VMs: 12 vCPU, 32 GB RAM. 5 VMs (`CONTROLLERS="3"`): 20 vCPU, 64 GB RAM |
-| **Time** | About 1 hour (57 min measured, `create.sh` to `destroy.sh`) | 3 VMs: 65 min measured, `create.sh` to `destroy.sh`. 5 VMs: 73 min measured, `create.sh` to the end of `deploy.sh` |
-| **Cost of one run** | 0.19 TND (0.05 EUR); 0.20 TND (0.06 EUR) with a floating IP | 3 VMs: 0.52 TND (0.15 EUR). 5 VMs: 1.05 TND (0.31 EUR) to build the lab |
+| **Time** | About 1 hour (57 min measured, `create.sh` to `destroy.sh`) | Measured, `create.sh` to `destroy.sh`: 65 min with 3 VMs, about 75 min with 5 VMs |
+| **Cost of one run** | 0.19 TND (0.05 EUR); 0.20 TND (0.06 EUR) with a floating IP | 3 VMs: 0.52 TND (0.15 EUR). 5 VMs: 1.08 TND (0.32 EUR) |
 | **Cost of each forgotten day** | 4.70 TND (1.37 EUR); 5.06 TND (1.49 EUR) with a floating IP | 3 VMs: 11.42 TND (3.34 EUR). 5 VMs: 20.83 TND (6.07 EUR) |
 
 New to OpenStack? Start with the single VM. The costs are the measured duration multiplied by the reference cloud's listed prices on
@@ -67,7 +67,8 @@ Then do your first exercise: [DHCP agents down](exercises/01-dhcp-agents-down.md
 >    `openstack floating ip list`, that nothing from the lab is left.
 > 3. On a pay-as-you-go cloud, check the next day that the usage really stopped.
 
-Every exercise ends with the same reminder: **Done for the day? Destroy the lab: every hour it exists costs money.**
+Every exercise ends with the same reminder: **Done with the lab for today?** Delete everything: a running lab keeps
+costing.
 
 ## Exercises
 

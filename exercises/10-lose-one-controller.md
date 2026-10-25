@@ -18,10 +18,12 @@ Read [before every exercise](README.md#before-every-exercise) and the
 - **Lab terminal:** logged in to **controller 1** (`<prefix><lab>-ctl-1`), with the lab's admin credentials loaded.
   Controller 1 is also the deploy host: this exercise never stops it, so that its tools stay available.
 - **Hosting terminal:** on your own computer, in the directory of the scripts, with the `OS_CLOUD` of your
-  `config.env`: it talks to the cloud that hosts the lab VMs, not to the lab.
+  `config.env` (`export OS_CLOUD=<your-cloud>`): it talks to the cloud that hosts the lab VMs, not to the lab.
 
-Note the VIP, written `<vip>` below. It is `kolla_internal_vip_address` in `/etc/kolla/globals.yml` on controller 1,
-and `VIP` in `.state/<prefix><lab>/state.env` on your computer; the port that reserves it is `<prefix><lab>-vip`.
+Note the VIP, written `<vip>` below. It is `kolla_internal_vip_address` in `/etc/kolla/globals.yml` on controller 1.
+In the hosting terminal, the port that reserves it is `<prefix><lab>-vip`
+(`openstack port show <prefix><lab>-vip -c fixed_ips`), and `openstack server list --name '^<prefix><lab>-'` lists
+the lab VMs with their addresses.
 
 Find which controller holds the VIP. From controller 1, for each controller address in `~/multinode`:
 
