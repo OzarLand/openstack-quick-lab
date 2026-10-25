@@ -4,8 +4,8 @@ Three scripts give you a multinode OpenStack (2026.1, deployed with Kolla-Ansibl
 cloud, in a little over an hour, and delete it all when you are done. It is the variant for what one VM cannot show:
 instances moving between computes, a compute that dies, and, in its larger size, a controller that dies.
 
-> **Status:** the 3-VM size was run end to end on 2026-10-25 (figures below). The 5-VM size is written in the
-> scripts but not yet run: its figures are estimates until its own run.
+> **Status:** both sizes were run on 2026-10-25 (figures below): the 3-VM size end to end, the 5-VM size from
+> `create.sh` to the end of `deploy.sh` (its `destroy.sh` is measured at the end of the HA exercises' run).
 
 ## The two sizes
 
@@ -15,7 +15,7 @@ default) or `"3"`.
 | Size | `CONTROLLERS` | VMs | Roles | Required quota |
 |---|---|---|---|---|
 | **Small** (default) | `"1"` | 3 | 1 controller (also the network node and the deploy host), 2 computes | 12 vCPU, 32 GB RAM, 3 instances |
-| **HA** (not yet run) | `"3"` | 5 | 3 controllers (also network nodes; controller 1 is the deploy host), 2 computes | 20 vCPU, 64 GB RAM, 5 instances |
+| **HA** | `"3"` | 5 | 3 controllers (also network nodes; controller 1 is the deploy host), 2 computes | 20 vCPU, 64 GB RAM, 5 instances |
 
 `create.sh` picks, for each role, the smallest flavor with at least 4 vCPU and 50 GB of disk: 16 GB of RAM for a
 controller, 8 GB for a compute. Set `CONTROLLER_FLAVOR` or `COMPUTE_FLAVOR` to force one. The lab also needs, in the
@@ -53,14 +53,13 @@ page says nothing about taxes.
 | Flavor `G0.basic.4c8g` (4 vCPU, 8 GB, 50 GB disk) | Each compute | 0.140 | 0.041 |
 | Floating IP | Only if you set `FLOATING_NETWORK` | 0.015 | 0.005 |
 
-| | 3 VMs (small), measured | 5 VMs (HA), **estimate, not yet run** |
+| | 3 VMs (small) | 5 VMs (HA) |
 |---|---|---|
 | Per hour | 0.476 TND (0.139 EUR) | 0.868 TND (0.253 EUR) |
 | Each day the lab is left running | 11.42 TND (3.34 EUR) | 20.83 TND (6.07 EUR) |
-| One full run, `create.sh` to `destroy.sh` | 0.52 TND (0.15 EUR): 65 min 27 s, measured on 2026-10-25 | _to be measured_ |
+| One run, measured on 2026-10-25 | `create.sh` to `destroy.sh`, 65 min 27 s: 0.52 TND (0.15 EUR) | `create.sh` to the end of `deploy.sh`, 72 min 50 s: 1.05 TND (0.31 EUR); its `destroy.sh` is to follow (1 min 14 s on the 3-VM run) |
 
-The measured figures are the measured duration multiplied by the listed prices, not an amount read from an invoice.
-The 5-VM figures are the listed prices of the flavors `create.sh` would choose, multiplied by the number of VMs.
+The figures for a run are the measured duration multiplied by the listed prices, not an amount read from an invoice.
 Add 0.015 TND (0.005 EUR) per hour if you use a floating IP. The exercises add their own time, at the hourly rate
 above.
 
@@ -69,11 +68,11 @@ On Felcloud, set `COST_PER_HOUR_CONTROLLER="0.196"`, `COST_PER_HOUR_COMPUTE="0.1
 
 ## The three commands
 
-| Script | What it does | Measured (3 VMs) |
-|---|---|---|
-| `create.sh` | Creates the VMs, their key, security group and ports, the lab's external network, and, if you want one, a floating IP for controller 1. Shows the estimated cost per hour and per day for all the VMs and asks before creating anything | 3 min 15 s |
-| `deploy.sh` | Prepares every VM, installs Kolla-Ansible on controller 1 and deploys OpenStack across the VMs: the control plane and the network services on the controller(s), `nova-compute` on the computes. Ends with a test instance on each compute and a live migration | 59 min 34 s |
-| `destroy.sh` | Deletes everything `create.sh` created, after asking, and checks that nothing is left | 1 min 14 s |
+| Script | What it does | Measured, 3 VMs | Measured, 5 VMs |
+|---|---|---|---|
+| `create.sh` | Creates the VMs, their key, security group and ports, the lab's external network (and the VIP port with 3 controllers), and, if you want one, a floating IP for controller 1. Shows the estimated cost per hour and per day for all the VMs and asks before creating anything | 3 min 15 s | 3 min 38 s |
+| `deploy.sh` | Prepares every VM, installs Kolla-Ansible on controller 1 and deploys OpenStack across the VMs: the control plane and the network services on the controller(s), `nova-compute` on the computes. Ends with a test instance on each compute and a live migration | 59 min 34 s | 69 min 13 s |
+| `destroy.sh` | Deletes everything `create.sh` created, after asking, and checks that nothing is left | 1 min 14 s | _to follow_ |
 
 The same safety rules as the [single-VM variant](../openstack-cloud/README.md):
 
@@ -156,7 +155,7 @@ With **3 VMs** (two computes):
 - **A build rescheduled on another compute**: when the first compute chosen fails the build, Nova retries on the
   other.
 
-With **5 VMs** (three controllers), once that size has been run, in addition:
+With **5 VMs** (three controllers), in addition:
 
 - **Losing a controller**, and what the other two keep doing.
 - **The Galera (MariaDB) and RabbitMQ clusters**: their state, a member that leaves and rejoins.
@@ -176,32 +175,36 @@ scripts differ from that pattern:
 | Pattern | These scripts | Why |
 |---|---|---|
 | A separate deploy host, with its own registry, proxy and NTP | Controller 1 is the deploy host; images from quay.io (or your `DOCKER_REGISTRY`), your `HTTPS_PROXY` and `NTP_SERVER` if you need them | One VM fewer to pay for |
-| Controllers of about 8 vCPU and 16 GB | Controllers of 4 vCPU and 16 GB (computes as in the pattern: 4 vCPU, 8 GB) | The smallest flavors that ran the 3-VM lab; set `CONTROLLER_FLAVOR` for bigger controllers |
+| Controllers of about 8 vCPU and 16 GB | Controllers of 4 vCPU and 16 GB (computes as in the pattern: 4 vCPU, 8 GB) | The smallest flavors that ran both sizes; set `CONTROLLER_FLAVOR` for bigger controllers |
 | keepalived in multicast | keepalived in unicast (3 controllers) | Some cloud networks drop multicast |
 | A dedicated volume for each compute's instance store | The compute's own disk, at Kolla-Ansible's default location | Simpler; a full instance store can then fill the compute's root file system |
 | 1 controller: not covered | No HAProxy, no keepalived, no ProxySQL; the API address is controller 1's | One controller needs no load balancer |
 
 ## Releases
 
-Last run on 2026-10-25, 3-VM size, on Felcloud: OpenStack 2026.1, Kolla-Ansible 22.2.0, ansible-core 2.20.10, images
+Last run on 2026-10-25, both sizes, on Felcloud: OpenStack 2026.1, Kolla-Ansible 22.2.0, ansible-core 2.20.10, images
 from quay.io through an HTTPS proxy, Ubuntu 24.04 VMs with nested KVM.
 
-| Step of `deploy.sh` | Time |
-|---|---|
-| Prepare every VM (in parallel) | 3 min 20 s |
-| Install Kolla-Ansible on controller 1 | 1 min 05 s |
-| Write the configuration | 7 s |
-| `bootstrap-servers` | 4 min 22 s |
-| `prechecks` | 48 s |
-| `pull` (images from quay.io) | 18 min 48 s |
-| `deploy` | 22 min 06 s |
-| `post-deploy`, client | 24 s |
-| Smoke test (an instance on each compute, ping and SSH, a live migration) | 8 min 32 s |
+| Step of `deploy.sh` | 3 VMs | 5 VMs |
+|---|---|---|
+| Prepare every VM (in parallel) | 3 min 20 s | 5 min 28 s |
+| Install Kolla-Ansible on controller 1 | 1 min 05 s | 1 min 16 s |
+| Write the configuration | 7 s | 11 s |
+| `bootstrap-servers` | 4 min 22 s | 4 min 40 s |
+| `prechecks` | 48 s | 1 min 45 s |
+| `pull` (images from quay.io) | 18 min 48 s | 21 min 03 s |
+| `deploy` | 22 min 06 s | 30 min 37 s |
+| `post-deploy`, client (and `osc-placement` since the 5-VM run) | 24 s | 26 s |
+| Smoke test (an instance on each compute, ping and SSH, a live migration) | 8 min 32 s | 3 min 50 s |
+| **`deploy.sh` in all** | **59 min 34 s** | **69 min 13 s** |
 
-During the smoke test, `demo1` live-migrated from one compute to the other in 35 s; a ping every 0.2 s lost 43 of
-166 replies, about 8.6 s, around the switch-over.
+The 5-VM size was run twice; the other run took 70 minutes from `create.sh` to the end of `deploy.sh`. On the 5-VM
+lab, the smoke test also checked the HA control plane: the VIP held by one controller, Galera with 3 nodes `Synced`
+and `Primary`, RabbitMQ with 3 running nodes, HAProxy's Keystone backends `UP` on the three controllers, and Nova's
+and Neutron's agents alive on all three.
 
-The 5-VM size: _to be measured_.
+The live migration of the smoke test lost, to a ping every 0.2 s: 8.6 s on the 3-VM run, 2.8 s and 2.4 s on the two
+5-VM runs.
 
 ## When something fails
 
