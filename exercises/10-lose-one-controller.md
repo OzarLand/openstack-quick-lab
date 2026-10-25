@@ -1,15 +1,12 @@
 # Exercise 10. Lose one controller: what keeps working
 
-> **Multinode variant, 3 controllers** only (`CONTROLLERS="3"`, 5 VMs). **Not yet run on a lab**: the 5-VM size was
-> built and checked on 2026-10-25 (see the [variant's guide](../variants/openstack-cloud-multinode/README.md)), but
-> this exercise has not been run on it yet. The commands and what you should see are written from Kolla-Ansible's
-> documentation, and are checked when the lab confirms them. Values marked _to be confirmed_ are filled in from that
-> run.
+> **Multinode variant, 3 controllers** only (`CONTROLLERS="3"`, 5 VMs). Run on a lab on 2026-10-25 (multinode variant,
+> 3 controllers + 2 computes): see the [lab review](https://github.com/OzarLand/openstack-quick-lab/pull/15#issuecomment-6399273095).
 
 **Goal:** make one of the three controllers fail, see that the APIs keep answering through the virtual IP, that
 keepalived moves the VIP if that controller held it, and that the Galera and RabbitMQ clusters keep their quorum;
 then bring the controller back and watch it rejoin.
-**Time:** about 30 minutes (estimate, not yet run).
+**Time:** about 40 minutes, most of it waiting for the agents and the clock.
 **Pattern:** [Three controllers and two computes, nested inside an existing OpenStack cloud](https://github.com/OzarLand/kolla-ansible-deployment-patterns/blob/main/topologies/three-controllers-two-computes-nested-in-an-openstack-cloud.md)
 (how the VIP, keepalived and the clusters are set up in this lab)
 
@@ -71,14 +68,29 @@ is the failure worth practising.
 
 ## 2. What you should see
 
-- In the loop, a few `FAILED` lines at most, then `ok` again. If `<ctl-x>` held the VIP, keepalived moves it to
+- In the loop, few or no `FAILED` lines, but some slow calls: on the lab, none failed, one took 17 s just after the
+  pause and several took 6 to 8 s over the next two minutes. If `<ctl-x>` held the VIP, keepalived moves it to
   another controller within a few seconds: check with the `ip -br addr` command above on the two others.
 - Galera, on a remaining controller: `wsrep_cluster_size` `2`, `wsrep_cluster_status` still `Primary`. Two of three
   is a majority: the cluster keeps its quorum and accepts writes.
 - RabbitMQ: `rabbitmqctl cluster_status` lists `<ctl-x>` among the nodes but not among the running ones.
-- HAProxy stops sending requests to `<ctl-x>`'s APIs. Create an instance to check that the whole path still works:
+- HAProxy stops sending requests to `<ctl-x>`'s APIs. Now create an instance, within the first few minutes after the
+  pause:
 
   ```bash
+  openstack server create --image cirros --flavor m1.tiny --network demo-net --key-name mykey --wait ex10-test
+  ```
+
+  **Expect it to fail.** On the lab it ended in `ERROR` after about 7 minutes, with `Build of instance … aborted:
+  Failed to allocate the network(s)`. The Open vSwitch agents of the computes were connected to RabbitMQ on
+  `<ctl-x>`. A paused VM does not close its TCP connections, so the agents waited for answers until they gave up on
+  it, about 7.5 minutes after the pause (`AMQP server on <address>:5672 is unreachable` in their logs), reconnected
+  to another controller, and only then wired ports again. A controller that hangs costs more than one that dies.
+
+  About 8 minutes after the pause, delete it and try again: this time it becomes `ACTIVE`.
+
+  ```bash
+  openstack server delete --wait ex10-test
   openstack server create --image cirros --flavor m1.tiny --network demo-net --key-name mykey --wait ex10-test
   ```
 
@@ -95,13 +107,33 @@ openstack server unpause <ctl-x-vm>     # hosting terminal
 
 ## 4. Check
 
-After a few minutes (_time to be confirmed_), on any controller:
+**Check the clock of the controller you paused, before you judge the services.** A paused VM comes back with its
+clock behind by about the time it was paused, and `timedatectl` may still say it is synchronised. Nova and Neutron
+then read its heartbeats as old, and services flap between `up` and `down` from one call to the next. From
+controller 1, compare `<ctl-x>`'s clock with controller 1's:
 
-- `wsrep_cluster_size` is `3` again, `Primary`: `<ctl-x>` rejoined Galera, with a state transfer if it missed too
-  much.
-- `rabbitmqctl cluster_status` lists three running nodes.
+```bash
+date -u +%T; ssh -i ~/.ssh/quicklab_ed25519 ubuntu@<ctl-x-address> 'date -u +%T'
+```
+
+If it is behind, step it:
+
+> ⚠️ **State-changing.** Restarts the time service of the controller, which steps its clock.
+
+```bash
+ssh -i ~/.ssh/quicklab_ed25519 ubuntu@<ctl-x-address> 'sudo systemctl restart systemd-timesyncd'
+```
+
+On the lab, the clock was 9 minutes behind after a 9-minute pause; once it was stepped, every service was `up` within
+40 s and stayed so. The runbook [clock skew](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/diagnostics/compute-clock-skew.md) explains the symptom on a compute; it is the same here.
+
+Then, on any controller:
+
+- `wsrep_cluster_size` is `3` again, `Primary`: `<ctl-x>` rejoined Galera (on the lab, within about 30 s of the
+  unpause).
+- `rabbitmqctl cluster_status` lists three running nodes (on the lab, within about 5 s).
 - The loop shows `ok`, and `openstack compute service list` and `openstack network agent list` show every service
-  `up` again.
+  `up` again, and stay so.
 
 If `<ctl-x>` does not rejoin after about 10 minutes, look at the logs of its `mariadb` and `rabbitmq` containers
 (`sudo docker logs --tail 50 mariadb`) before you do anything else.

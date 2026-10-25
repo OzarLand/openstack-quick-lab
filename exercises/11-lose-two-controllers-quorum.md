@@ -1,14 +1,11 @@
 # Exercise 11. Lose two controllers: quorum lost, and recovered
 
-> **Multinode variant, 3 controllers** only (`CONTROLLERS="3"`, 5 VMs). **Not yet run on a lab**: the 5-VM size was
-> built and checked on 2026-10-25 (see the [variant's guide](../variants/openstack-cloud-multinode/README.md)), but
-> this exercise has not been run on it yet. The commands and what you should see are written from Kolla-Ansible's
-> documentation and the deployment-error page below, and are checked when the lab confirms them. Values marked
-> _to be confirmed_ are filled in from that run.
+> **Multinode variant, 3 controllers** only (`CONTROLLERS="3"`, 5 VMs). Run on a lab on 2026-10-25 (multinode variant,
+> 3 controllers + 2 computes): see the [lab review](https://github.com/OzarLand/openstack-quick-lab/pull/15#issuecomment-6399273095).
 
 **Goal:** make two of the three controllers fail at once, see the Galera cluster lose its quorum and the APIs stop,
 then recover the cluster with Kolla-Ansible's `mariadb-recovery`.
-**Time:** about 45 minutes (estimate, not yet run).
+**Time:** about 30 minutes, or 45 with the optional recovery of step 4.
 **Procedure:** the recovery step of
 [kolla-ansible deploy fails part-way because Ubuntu upgraded packages during the deploy](https://github.com/OzarLand/kolla-ansible-deployment-patterns/blob/main/deployment-errors/unattended-upgrades-during-deploy-breaks-the-mariadb-cluster.md#recover-the-failed-deploy)
 (its `mariadb-recovery` part, with the warning and the backup it asks for)
@@ -52,11 +49,19 @@ openstack server unpause <ctl-2-vm>     # hosting terminal
 openstack server unpause <ctl-3-vm>
 ```
 
-Wait about 5 minutes (_to be confirmed_), then check Galera again on each controller. If the three nodes are back in
-one `Primary` cluster of size `3`, Galera recovered on its own: go to step 5. If not (no node `Primary`, or a
-`mariadb` container restarting), the cluster needs the recovery below.
+Wait a minute, then check Galera again on each controller. On the lab, the three nodes were back in one `Primary`
+cluster of size `3` within about 25 s: a paused node keeps its state, and when it answers again Galera reforms the
+cluster by itself. If that is what you see, go to step 5; step 4 is then optional. If not (no node `Primary`, or a
+`mariadb` container restarting), the cluster needs the recovery of step 4.
 
-## 4. Recover the cluster
+Before reading on: what kind of failure would keep Galera from coming back on its own?
+
+## 4. Recover the cluster (if Galera did not come back on its own)
+
+You need this step when the nodes lost their state at the same time, for example after a power cut of the whole
+control plane. After a pause, Galera usually recovers by itself (step 3) and you can skip it. To practise it anyway,
+run it on the healthy cluster, as the lab did: it works the same way. On the lab it took 200 s, and each copy of the
+data below was about 2.3 GB.
 
 Follow the page's recovery step, from controller 1. Read its warning in full before you start: it is the reason this
 step is marked destructive.
@@ -76,8 +81,11 @@ it again about a minute later, in the middle of the copy (see
 ```bash
 sudo systemctl stop kolla-mariadb-container.service
 sudo cp -a /var/lib/docker/volumes/mariadb /root/mariadb-before-recovery
-sudo grep seqno /var/lib/docker/volumes/mariadb/_data/grastate.dat
+sudo grep -E 'seqno|safe_to_bootstrap' /var/lib/docker/volumes/mariadb/_data/grastate.dat
 ```
+
+Stop them one after the other: the last one stopped has the highest `seqno` and `safe_to_bootstrap: 1`, and
+`mariadb-recovery` bootstraps from it.
 
 Then, on controller 1:
 
@@ -88,7 +96,27 @@ kolla-ansible mariadb-recovery -i ~/multinode
 
 ## 5. Check
 
-Follow the page's **Verification**, on each controller:
+**Check the clock of each controller you paused, before you judge the services.** A paused VM comes back with its
+clock behind by about the time it was paused, and `timedatectl` may still say it is synchronised. Nova and Neutron
+then read its heartbeats as old, and services flap between `up` and `down` from one call to the next. From
+controller 1, compare each paused controller's clock with controller 1's:
+
+```bash
+date -u +%T; ssh -i ~/.ssh/quicklab_ed25519 ubuntu@<controller-address> 'date -u +%T'
+```
+
+If it is behind, step it:
+
+> ⚠️ **State-changing.** Restarts the time service of the controller, which steps its clock.
+
+```bash
+ssh -i ~/.ssh/quicklab_ed25519 ubuntu@<controller-address> 'sudo systemctl restart systemd-timesyncd'
+```
+
+On the lab, the clock was 9 minutes behind after a 9-minute pause; once it was stepped, every service was `up` within
+40 s and stayed so. The runbook [clock skew](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/diagnostics/compute-clock-skew.md) explains the symptom on a compute; it is the same here.
+
+Then follow the page's **Verification**, on each controller:
 
 - `wsrep_cluster_size` `3`, `wsrep_cluster_status` `Primary`.
 - `rabbitmqctl cluster_status` lists three running nodes. If RabbitMQ did not recover with the controllers, look at

@@ -31,14 +31,14 @@ run on a lab**; their times are estimates until they are. Exercises 8 and 9 use 
 
 ### Multinode variant, 3 controllers
 
-These two need the 5-VM size of the multinode variant (`CONTROLLERS="3"`). The 5-VM size was built and
-checked on 2026-10-25, but these two exercises are **not yet run on a lab**; their times are estimates until they
-are.
+These two need the 5-VM size of the multinode variant (`CONTROLLERS="3"`). They were
+[run on a lab](https://github.com/OzarLand/openstack-quick-lab/pull/15#issuecomment-6399273095) on 2026-10-25
+(multinode variant, 3 controllers + 2 computes).
 
 | # | Exercise | Time | What you learn |
 |---|---|---|---|
-| 10 | [Lose one controller: what keeps working](10-lose-one-controller.md) | 30 min | The VIP moves, two of three is still a quorum, a controller rejoins |
-| 11 | [Lose two controllers: quorum lost, and recovered](11-lose-two-controllers-quorum.md) | 45 min | Why a minority stops serving, and how `mariadb-recovery` rebuilds the cluster |
+| 10 | [Lose one controller: what keeps working](10-lose-one-controller.md) | 40 min | The VIP moves, two of three is still a quorum, a hung controller costs more than a dead one, a controller rejoins |
+| 11 | [Lose two controllers: quorum lost, and recovered](11-lose-two-controllers-quorum.md) | 30 to 45 min | Why a minority stops serving, when Galera recovers by itself, and how `mariadb-recovery` rebuilds the cluster when it does not |
 
 ## Before every exercise
 
