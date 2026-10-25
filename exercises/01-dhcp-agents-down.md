@@ -29,7 +29,8 @@ openstack server create --image cirros --flavor m1.tiny --network demo-net --key
 
 ## 2. What you should see
 
-- `openstack server show ex1-test -c status` says `ACTIVE`, and `addresses` shows an IP address: Neutron allocated it.
+- `openstack server show ex1-test -c status -c addresses` says `ACTIVE`, and `addresses` shows an IP address: Neutron
+  allocated it.
 - The instance never received it. In its console log, the DHCP client asks and gets no answer. Wait about three
   minutes after the creation, then:
 

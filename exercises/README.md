@@ -7,38 +7,6 @@ pages of [kolla-ansible-deployment-patterns](https://github.com/OzarLand/kolla-a
 instead). The runbooks of exercises 1 to 9 were
 checked on a lab (`status: lab-verified`).
 
-## How an exercise works
-
-```mermaid
-flowchart LR
-    brk["Break<br/>something"] --> see["See the<br/>symptom"]
-    see --> rb["Follow the<br/>runbook"]
-    rb --> fix["Repair"]
-    fix --> ok["Verify"]
-```
-
-Most pages follow these steps in order, then clean up what they created and remind you to delete the lab.
-
-> **Why the exercises use `systemctl`, not `docker`, to stop a service**
->
-> Kolla-Ansible gives each container a systemd unit, `/etc/systemd/system/kolla-<container>-container.service`
-> ([release note](https://github.com/openstack/kolla-ansible/blob/stable/2026.1/releasenotes/notes/add-systemd-container-control-b85dff9ec5fae313.yaml);
-> [the code that writes the unit](https://github.com/openstack/kolla-ansible/blob/stable/2026.1/ansible/module_utils/kolla_systemd_worker.py)). It is still the case in
-> 2026.1, the release of these labs.
->
-> - The unit starts the container with `docker start -a <container>` and stops it with `docker stop`.
-> - With Kolla-Ansible's default `docker_restart_policy: "unless-stopped"`
->   ([`ansible/group_vars/all/common.yml`](https://github.com/openstack/kolla-ansible/blob/stable/2026.1/ansible/group_vars/all/common.yml)), the unit gets `Restart=always`.
-> - So `docker stop <container>` alone is undone: systemd starts the container again. `systemctl stop
->   kolla-<container>-container.service` keeps it stopped.
-> - The delay before systemd restarts it (`RestartSec`) comes from `docker_client_timeout`: one tenth of it, minus one
->   second. It is 11 s with Kolla-Ansible's default of 120 s; these labs set 600 s, so **59 s**. On the 5-VM lab, a
->   `neutron_dhcp_agent` stopped with `docker stop` was running again about 70 s later
->   ([measurement](https://github.com/OzarLand/openstack-quick-lab/pull/13#issuecomment-6398277862)).
->
-> The exercises use `docker` only to look (`docker ps`, `docker exec`, `docker logs`). On a deployment without these
-> units (an older release, or another deployment tool), use that tool's own way to stop a service.
-
 | # | Exercise | Time | What you learn |
 |---|---|---|---|
 | 1 | [DHCP agents down](01-dhcp-agents-down.md) | 20 min | An instance can be `ACTIVE` and still have no address |
@@ -72,6 +40,26 @@ These two need the 5-VM size of the multinode variant (`CONTROLLERS="3"`). They 
 | 10 | [Lose one controller: what keeps working](10-lose-one-controller.md) | 40 min | The VIP moves, two of three is still a quorum, a hung controller costs more than a dead one, a controller rejoins |
 | 11 | [Lose two controllers: quorum lost, and recovered](11-lose-two-controllers-quorum.md) | 30 to 45 min | Why a minority stops serving, when Galera recovers by itself, and how `mariadb-recovery` rebuilds the cluster when it does not |
 
+> **Why the exercises use `systemctl`, not `docker`, to stop a service**
+>
+> Kolla-Ansible gives each container a systemd unit, `/etc/systemd/system/kolla-<container>-container.service`
+> ([release note](https://github.com/openstack/kolla-ansible/blob/stable/2026.1/releasenotes/notes/add-systemd-container-control-b85dff9ec5fae313.yaml);
+> [the code that writes the unit](https://github.com/openstack/kolla-ansible/blob/stable/2026.1/ansible/module_utils/kolla_systemd_worker.py)). It is still the case in
+> 2026.1, the release of these labs.
+>
+> - The unit starts the container with `docker start -a <container>` and stops it with `docker stop`.
+> - With Kolla-Ansible's default `docker_restart_policy: "unless-stopped"`
+>   ([`ansible/group_vars/all/common.yml`](https://github.com/openstack/kolla-ansible/blob/stable/2026.1/ansible/group_vars/all/common.yml)), the unit gets `Restart=always`.
+> - So `docker stop <container>` alone is undone: systemd starts the container again. `systemctl stop
+>   kolla-<container>-container.service` keeps it stopped.
+> - The delay before systemd restarts it (`RestartSec`) comes from `docker_client_timeout`: one tenth of it, minus one
+>   second. It is 11 s with Kolla-Ansible's default of 120 s; these labs set 600 s, so **59 s**. On the 5-VM lab, a
+>   `neutron_dhcp_agent` stopped with `docker stop` was running again about 70 s later
+>   ([measurement](https://github.com/OzarLand/openstack-quick-lab/pull/13#issuecomment-6398277862)).
+>
+> The exercises use `docker` only to look (`docker ps`, `docker exec`, `docker logs`). On a deployment without these
+> units (an older release, or another deployment tool), use that tool's own way to stop a service.
+
 ## Before every exercise
 
 - The lab is running, and you followed its variant's guide to the end.
@@ -93,7 +81,7 @@ The lab's scripts run Kolla-Ansible's `init-runonce`, which creates the resource
 | Tenant network, behind the router `demo-router` | `demo-net` |
 | External network | `public1` |
 | Key pair | `mykey` |
-| External network's address range | the `LAB_EXT_CIDR` variable of the launch script, `10.99.0.0/24` by default |
+| External network's address range | the `LAB_EXT_CIDR` setting of `config.env`, `10.99.0.0/24` by default |
 
 The exercises write the external range as `10.99.0.0/24`. If you changed `LAB_EXT_CIDR` in `config.env` before
 launching the lab, use your range instead.

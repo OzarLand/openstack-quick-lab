@@ -15,7 +15,7 @@ Read [before every exercise](README.md#before-every-exercise) and the
 
 - **Lab terminal:** logged in to controller 1, with the lab's admin credentials loaded.
 - **Hosting terminal:** on your own computer, in the directory of the scripts, with the `OS_CLOUD` of your
-  `config.env`: it talks to the cloud that hosts the lab VMs, not to the lab.
+  `config.env` (`export OS_CLOUD=<your-cloud>`): it talks to the cloud that hosts the lab VMs, not to the lab.
 
 In the lab terminal, list the two computes and note their names, written `<compute-1>` and `<compute-2>` below:
 

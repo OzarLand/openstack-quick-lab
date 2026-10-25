@@ -7,12 +7,17 @@ dies, and, with 5 VMs, a controller that dies.
 ## Quick start
 
 ```bash
-cp config.example.env config.env && $EDITOR config.env   # OS_CLOUD, NETWORK, SSH_FROM, the two prices; CONTROLLERS="3" for 5 VMs
+cp config.example.env config.env && $EDITOR config.env   # OS_CLOUD, NETWORK, SSH_FROM, the two prices; FLOATING_NETWORK if you use one; CONTROLLERS="3" for 5 VMs
 ./create.sh                                              # shows the cost of all the VMs, asks, creates them (3 to 4 min)
-./deploy.sh                                              # deploys OpenStack across them (60 to 70 min)
-ssh -i .state/quicklab-multi-1/id_ed25519 ubuntu@<controller-1-address>   # openstack server list
-./destroy.sh                                             # deletes everything, after asking
+./deploy.sh                                              # deploys OpenStack across them (60 to 70 min); run it inside tmux
+ssh -i .state/quicklab-multi-1/id_ed25519 ubuntu@<controller-1-address>   # then, on controller 1:
+source ~/kolla-venv/bin/activate; . /etc/kolla/admin-openrc.sh; openstack server list
+./destroy.sh                                             # back on your computer: deletes everything, after asking
 ```
+
+- **`SSH_FROM`** and **tmux**: as in the single-VM [quick start](../openstack-cloud/README.md#quick-start).
+- **Time**: plan about 75 minutes (3 VMs) to 90 minutes (5 VMs) before your first exercise: 63 and 73 minutes
+  measured for `create.sh` and `deploy.sh`, plus filling in `config.env` and logging in.
 
 Read [the cost risk](#the-cost-risk) first. It runs 3 to 5 VMs, so it costs 2.5 to 4.5 times the
 [single-VM variant](../openstack-cloud/README.md). The rest of this page is the detail.
@@ -24,30 +29,31 @@ Read [the cost risk](#the-cost-risk) first. It runs 3 to 5 VMs, so it costs 2.5 
 
 ```mermaid
 flowchart TB
-    you["Your terminal"] -- SSH --> ctl1
+    you["Your terminal"] -- "SSH (floating IP<br/>of your cloud, optional)" --> ctl1
     subgraph cloud["Your OpenStack cloud"]
-        vip(["VIP<br/>5 VMs only"])
-        subgraph ctls["Controllers"]
-            ctl1["Controller 1<br/>deploy host"]
-            ctl23["Controllers 2 and 3<br/>5 VMs only"]
+        subgraph net["NETWORK (your project)"]
+            vip(["VIP<br/>5 VMs only"])
+            subgraph ctls["Controllers"]
+                ctl1["Controller 1<br/>deploy host"]
+                ctl23["Controllers 2 and 3<br/>5 VMs only"]
+            end
+            cmps["Compute 1, Compute 2<br/>test instances"]
         end
-        subgraph cmps["Computes"]
-            cmp1["Compute 1<br/>test instances"]
-            cmp2["Compute 2<br/>test instances"]
-        end
-        ext["Lab network<br/>floating IPs"]
+        ext["Lab network, LAB_EXT_CIDR<br/>= the lab's public1"]
     end
-    vip -.-> ctls
-    ctls --> cmps
-    ctls --> ext
+    vip -. "on one controller" .- ctls
+    ctls -- "APIs, instance traffic" --- cmps
+    ctls -- "lab floating IPs" --- ext
 ```
 
-- **All the VMs** have their address in your project network (`NETWORK`).
+- **All the VMs** have their address in your project network (`NETWORK`). You reach controller 1 on that
+  address, or on a floating IP of your cloud if you set `FLOATING_NETWORK`.
 - **Controllers** run the control plane and the network services. Controller 1 is also the deploy host: you work
   there.
 - **Computes** run `nova-compute` and the test instances.
 - **The lab network** (`quicklab-multi-1-ext`, range `LAB_EXT_CIDR`) is created by the scripts. It carries the lab's
-  floating IPs and is attached to the controllers only.
+  own floating IPs (`public1`, inside the lab) and is attached to the controllers only. It is not the floating IP
+  of your cloud.
 - **The VIP** exists with 3 controllers only: an address of `NETWORK` that keepalived moves between them. With
   1 controller, the API address is controller 1's.
 
