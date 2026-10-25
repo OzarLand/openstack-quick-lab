@@ -156,7 +156,8 @@ bootstrap() {
 prechecks()  { if [ -z "$DOCKER_REGISTRY" ]; then kolla prechecks --use-test-images; else kolla prechecks; fi; }
 pull()       { kolla pull; }
 deploy()     { kolla deploy; }
-postdeploy() { kolla post-deploy; "${PX[@]}" "$VENV/bin/pip" install -q python-openstackclient; }
+# osc-placement: the "openstack allocation candidate" and "resource provider" commands the runbooks use.
+postdeploy() { kolla post-deploy; "${PX[@]}" "$VENV/bin/pip" install -q python-openstackclient osc-placement; }
 wait_ping() { for _ in $(seq 1 36); do ping -c 1 -W 2 "$1" >/dev/null && return 0; sleep 5; done; return 1; }
 wait_ssh() {
   for _ in $(seq 1 18); do
@@ -173,7 +174,7 @@ smoke_test() {
     "$VENV/share/kolla-ansible/init-runonce" > "$M/init-runonce.log" 2>&1 || { tail -5 "$M/init-runonce.log"; return 1; }
   local hosts n=0 h s fip t0 lost
   mapfile -t hosts < <(openstack compute service list --service nova-compute -f value -c Host | sort)
-  echo "   computes: ${hosts[*]}"
+  echo "   computes: ${hosts[*]}; placement candidates for m1.tiny: $(openstack allocation candidate list --resource VCPU=1 --resource MEMORY_MB=512 -f value | wc -l)"
   for h in "${hosts[@]}"; do
     n=$((n+1)); s="demo$n"
     openstack server show "$s" >/dev/null 2>&1 || openstack server create --image cirros --flavor m1.tiny --key-name mykey --network demo-net \
