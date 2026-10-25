@@ -17,8 +17,8 @@ ssh -i .state/quicklab-multi-1/id_ed25519 ubuntu@<controller-1-address>   # open
 Read [the cost risk](#the-cost-risk) first. It runs 3 to 5 VMs, so it costs 2.5 to 4.5 times the
 [single-VM variant](../openstack-cloud/README.md). The rest of this page is the detail.
 
-> **Status:** both sizes were run on 2026-10-25 (figures below): the 3-VM size end to end, the 5-VM size from
-> `create.sh` to the end of `deploy.sh` (its `destroy.sh` is measured at the end of the HA exercises' run).
+> **Status:** both sizes were run end to end on 2026-10-25, from `create.sh` to `destroy.sh` (figures below);
+> `destroy.sh` left nothing behind either time.
 
 ## What you get
 
@@ -72,7 +72,7 @@ One setting in `config.env`, `CONTROLLERS`, chooses the size: `"1"` (the default
 |---|---|---|---|
 | `create.sh` | Creates the VMs, their key, security group and ports, the lab network (and the VIP port with 3 controllers), and, if you want one, a floating IP for controller 1. Shows the estimated cost per hour and per day for all the VMs and asks before creating anything | 3 min 15 s | 3 min 38 s |
 | `deploy.sh` | Prepares every VM, installs Kolla-Ansible on controller 1 and deploys OpenStack across the VMs: the control plane and the network services on the controller(s), `nova-compute` on the computes. Ends with a test instance on each compute and a live migration | 59 min 34 s | 69 min 13 s |
-| `destroy.sh` | Deletes everything `create.sh` created, after asking, and checks that nothing is left | 1 min 14 s | _to follow_ |
+| `destroy.sh` | Deletes everything `create.sh` created, after asking, and checks that nothing is left | 1 min 14 s | 1 min 53 s |
 
 ## The cost risk
 
@@ -109,7 +109,7 @@ bills per second. Prices are its pay-as-you-go prices per hour, as listed on 202
 |---|---|---|
 | Per hour | 0.476 TND (0.139 EUR) | 0.868 TND (0.253 EUR) |
 | Each day the lab is left running | 11.42 TND (3.34 EUR) | 20.83 TND (6.07 EUR) |
-| One run, measured on 2026-10-25 | `create.sh` to `destroy.sh`, 65 min 27 s: 0.52 TND (0.15 EUR) | `create.sh` to the end of `deploy.sh`, 72 min 50 s: 1.05 TND (0.31 EUR); its `destroy.sh` is to follow (1 min 14 s on the 3-VM run) |
+| One run, measured on 2026-10-25 | `create.sh` to `destroy.sh`, 65 min 27 s: 0.52 TND (0.15 EUR) | `create.sh` to the end of `deploy.sh`, 72 min 50 s: 1.05 TND (0.31 EUR); a build followed at once by `destroy.sh`, about 75 min: 1.08 TND (0.32 EUR) |
 
 - The figures for a run are the measured duration multiplied by the listed prices, not an amount read from an
   invoice.
