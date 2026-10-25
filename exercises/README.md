@@ -1,7 +1,7 @@
 # Exercises
 
-Six short exercises on the all-in-one lab, and three on the multinode variant. Each one breaks one thing on purpose, shows you what an operator would
-see, and walks you through the repair with a runbook from
+Six short exercises on the all-in-one lab, and three on the multinode variant. Each one breaks one thing on
+purpose, shows you what an operator would see, and walks you through the repair with a runbook from
 [openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks). The runbooks of exercises 1 to 7 were
 checked on a lab (`status: lab-verified`); exercises 8 and 9 use a runbook still marked `status: draft`.
 
