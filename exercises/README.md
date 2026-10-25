@@ -7,6 +7,26 @@ pages of [kolla-ansible-deployment-patterns](https://github.com/OzarLand/kolla-a
 instead). The runbooks of exercises 1 to 7 were
 checked on a lab (`status: lab-verified`); exercises 8 and 9 use a runbook still marked `status: draft`.
 
+> **Why the exercises use `systemctl`, not `docker`, to stop a service**
+>
+> Kolla-Ansible gives each container a systemd unit, `/etc/systemd/system/kolla-<container>-container.service`
+> ([release note](https://github.com/openstack/kolla-ansible/blob/stable/2026.1/releasenotes/notes/add-systemd-container-control-b85dff9ec5fae313.yaml);
+> [the code that writes the unit](https://github.com/openstack/kolla-ansible/blob/stable/2026.1/ansible/module_utils/kolla_systemd_worker.py)). It is still the case in
+> 2026.1, the release of these labs.
+>
+> - The unit starts the container with `docker start -a <container>` and stops it with `docker stop`.
+> - With Kolla-Ansible's default `docker_restart_policy: "unless-stopped"`
+>   ([`ansible/group_vars/all/common.yml`](https://github.com/openstack/kolla-ansible/blob/stable/2026.1/ansible/group_vars/all/common.yml)), the unit gets `Restart=always`.
+> - So `docker stop <container>` alone is undone: systemd starts the container again. `systemctl stop
+>   kolla-<container>-container.service` keeps it stopped.
+> - The delay before systemd restarts it (`RestartSec`) comes from `docker_client_timeout`: one tenth of it, minus one
+>   second. It is 11 s with Kolla-Ansible's default of 120 s; these labs set 600 s, so **59 s**. On the 5-VM lab, a
+>   `neutron_dhcp_agent` stopped with `docker stop` was running again about 70 s later
+>   ([measurement](https://github.com/OzarLand/openstack-quick-lab/pull/13#issuecomment-6398277862)).
+>
+> The exercises use `docker` only to look (`docker ps`, `docker exec`, `docker logs`). On a deployment without these
+> units (an older release, or another deployment tool), use that tool's own way to stop a service.
+
 | # | Exercise | Time | What you learn |
 |---|---|---|---|
 | 1 | [DHCP agents down](01-dhcp-agents-down.md) | 20 min | An instance can be `ACTIVE` and still have no address |
@@ -19,8 +39,8 @@ checked on a lab (`status: lab-verified`); exercises 8 and 9 use a runbook still
 ### Multinode variant
 
 These three need two computes: run them on the
-[multinode variant](../variants/openstack-cloud-multinode/README.md), not on the all-in-one lab. They are **not yet
-run on a lab**; their times are estimates until they are. Exercises 8 and 9 use a runbook still marked
+[multinode variant](../variants/openstack-cloud-multinode/README.md), not on the all-in-one lab. They were
+[run on a lab](https://github.com/OzarLand/openstack-quick-lab/pull/10#issuecomment-6397487220) on 2026-10-25 (multinode variant, 1 controller + 2 computes). Exercises 8 and 9 use a runbook still marked
 `status: draft`.
 
 | # | Exercise | Time | What you learn |

@@ -1,11 +1,11 @@
 # Exercise 8. Drain a compute for planned maintenance
 
-> **Multinode variant** only: it needs two computes. **Not yet run on a lab**: the commands and what you should see
-> are written from the runbook and Nova's documentation, and are checked when the lab confirms them.
+> **Multinode variant** only: it needs two computes. Run on a lab on 2026-10-25 (multinode variant, 1 controller +
+> 2 computes): see the [lab review](https://github.com/OzarLand/openstack-quick-lab/pull/10#issuecomment-6397487220).
 
 **Goal:** take a compute out of service without stopping anyone's instances: stop new instances landing on it, move
 its instances to the other compute, work on it, and put it back.
-**Time:** about 30 minutes (estimate, not yet run).
+**Time:** about 30 minutes (about 10 minutes of commands on the lab, plus the reboot wait and reading).
 **Runbook:** [Moving instances off a host for maintenance](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/migration/moving-instances-off-a-host-for-maintenance.md) (`status: draft`: not yet
 checked on a lab; it also covers live migration)
 
@@ -43,7 +43,7 @@ openstack compute service list --service nova-compute
 
 ## 2. What you should see
 
-- `<compute-1>` is `enabled: disabled` and still `up`: disabled is a scheduling decision, not a failure.
+- `<compute-1>` shows Status `disabled` and State `up`: disabled is a scheduling decision, not a failure.
 - A new instance created without a host goes to `<compute-2>`:
 
   ```bash
@@ -58,12 +58,17 @@ Before reading on: disabling a compute moved nothing. What will you do with `ex8
 Follow the runbook from its **Quick checks**:
 
 1. Its checks before moving anything: the other compute is `up` and has room, and the instances to move are listed.
+   On this lab, the runbook's capacity check cannot be run yet: `openstack hypervisor list --long` no longer shows
+   vCPU and memory with this client, and `openstack allocation candidate list` needs the `osc-placement` client
+   plugin, which the lab's scripts do not install yet. Skip that check here: the other compute has room for two
+   `m1.tiny` instances.
 2. Move each instance off `<compute-1>`, live, as the runbook's **Resolution** shows. On this lab the instances have no
    shared storage, so a live migration also copies their disk (block migration); the runbook says which option that
    takes.
 
-   > ⚠️ **State-changing.** Live-migrates `ex8-test-a` and `ex8-test-b` to `<compute-2>`. They keep running; a ping
-   > to them may lose a packet or two at the switch-over.
+   > ⚠️ **State-changing.** Live-migrates `ex8-test-a` and `ex8-test-b` to `<compute-2>`. They keep running, but
+   > their network stops for a while at the switch-over: [exercise 9](09-live-migration-between-computes.md) measures
+   > how long.
 
 3. Check that nothing is left on the host before you work on it:
 
@@ -86,10 +91,18 @@ Follow the runbook from its **Quick checks**:
 Follow the runbook's **Verification**: after the reboot, `<compute-1>` is `up` again, the moved instances are `ACTIVE`
 on `<compute-2>`, and nothing was lost.
 
+**Wait for the compute before you enable it.** Just after the reboot, `<compute-1>` still shows `up`: that is its last
+heartbeat, not a new one. On the lab it then showed `down` about a minute later, and `up` again about 4 minutes after
+the reboot. Wait until it is `up` **with a new `Updated At`**, later than the reboot:
+
 ```bash
-openstack compute service list --service nova-compute
+openstack compute service list --service nova-compute -c Host -c Status -c State -c "Updated At"
 openstack server list --host <compute-2> -c Name -c Status
 ```
+
+If you enable it before that, the client may print `Failed to set service status to enabled`: the API timed out
+reaching the compute, which was still rebooting. On the lab the change took effect anyway; check the Status column,
+and run the command again if it still says `disabled`.
 
 Then put the compute back in service:
 
