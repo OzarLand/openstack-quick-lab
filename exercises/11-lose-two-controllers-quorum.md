@@ -1,9 +1,10 @@
 # Exercise 11. Lose two controllers: quorum lost, and recovered
 
-> **Multinode variant, 3 controllers** only (`CONTROLLERS="3"`, 5 VMs). **Not yet run on a lab**: the 5-VM size of
-> the scripts has not been run yet either. The commands and what you should see are written from Kolla-Ansible's
+> **Multinode variant, 3 controllers** only (`CONTROLLERS="3"`, 5 VMs). **Not yet run on a lab**: the 5-VM size was
+> built and checked on 2026-10-25 (see the [variant's guide](../variants/openstack-cloud-multinode/README.md)), but
+> this exercise has not been run on it yet. The commands and what you should see are written from Kolla-Ansible's
 > documentation and the deployment-error page below, and are checked when the lab confirms them. Values marked
-> _to be confirmed_ are filled in from the 5-VM scripts' run.
+> _to be confirmed_ are filled in from that run.
 
 **Goal:** make two of the three controllers fail at once, see the Galera cluster lose its quorum and the APIs stop,
 then recover the cluster with Kolla-Ansible's `mariadb-recovery`.
@@ -65,8 +66,20 @@ step is marked destructive.
 > Every OpenStack API is unavailable while it runs. Copy the data aside first, as the page shows. Disposable lab
 > only.
 
-On each controller, with its `mariadb` container stopped, copy the data volume aside and note the `seqno` of
-`grastate.dat`, as the page shows. Then, on controller 1:
+On each controller, stop the `mariadb` container with its systemd unit, not with `docker stop`: systemd would start
+it again about a minute later, in the middle of the copy (see
+[why the exercises use `systemctl`](README.md)). Then copy the data volume aside and note the `seqno` of
+`grastate.dat`, as the page shows:
+
+> ⚠️ **State-changing.** Stops MariaDB on the controller and writes a copy of its data under `/root`.
+
+```bash
+sudo systemctl stop kolla-mariadb-container.service
+sudo cp -a /var/lib/docker/volumes/mariadb /root/mariadb-before-recovery
+sudo grep seqno /var/lib/docker/volumes/mariadb/_data/grastate.dat
+```
+
+Then, on controller 1:
 
 ```bash
 source ~/kolla-venv/bin/activate
@@ -91,7 +104,16 @@ Follow the page's **Verification**, on each controller:
 ## 6. Clean up
 
 If you stopped half-way, unpause both controllers first, and recover the cluster if it is not `Primary` (step 4).
-Stop the loop with Ctrl-C, delete the copies of the data volumes you made, and delete the test instance:
+Stop the loop with Ctrl-C. Once the cluster is `Primary` with 3 nodes, delete the copies of the data volumes you
+made, on each controller:
+
+> 🛑 **Destructive.** Deletes the copy of MariaDB's data: after this, the recovery cannot be undone from it.
+
+```bash
+sudo rm -rf /root/mariadb-before-recovery
+```
+
+Then delete the test instance:
 
 ```bash
 openstack server delete --wait ex11-test

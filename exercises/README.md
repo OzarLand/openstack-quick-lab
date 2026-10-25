@@ -31,8 +31,9 @@ run on a lab**; their times are estimates until they are. Exercises 8 and 9 use 
 
 ### Multinode variant, 3 controllers
 
-These two need the 5-VM size of the multinode variant (`CONTROLLERS="3"`). They are **not yet run on a lab**, and
-neither is the 5-VM size; their times are estimates until they are.
+These two need the 5-VM size of the multinode variant (`CONTROLLERS="3"`). The 5-VM size was built and
+checked on 2026-10-25, but these two exercises are **not yet run on a lab**; their times are estimates until they
+are.
 
 | # | Exercise | Time | What you learn |
 |---|---|---|---|

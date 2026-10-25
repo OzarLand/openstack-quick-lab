@@ -1,9 +1,10 @@
 # Exercise 10. Lose one controller: what keeps working
 
-> **Multinode variant, 3 controllers** only (`CONTROLLERS="3"`, 5 VMs). **Not yet run on a lab**: the 5-VM size of
-> the scripts has not been run yet either. The commands and what you should see are written from Kolla-Ansible's
-> documentation, and are checked when the lab confirms them. Values marked _to be confirmed_ are filled in from the
-> 5-VM scripts' run.
+> **Multinode variant, 3 controllers** only (`CONTROLLERS="3"`, 5 VMs). **Not yet run on a lab**: the 5-VM size was
+> built and checked on 2026-10-25 (see the [variant's guide](../variants/openstack-cloud-multinode/README.md)), but
+> this exercise has not been run on it yet. The commands and what you should see are written from Kolla-Ansible's
+> documentation, and are checked when the lab confirms them. Values marked _to be confirmed_ are filled in from that
+> run.
 
 **Goal:** make one of the three controllers fail, see that the APIs keep answering through the virtual IP, that
 keepalived moves the VIP if that controller held it, and that the Galera and RabbitMQ clusters keep their quorum;
@@ -34,13 +35,16 @@ ssh -i ~/.ssh/quicklab_ed25519 ubuntu@<controller-address> "ip -br addr | grep -
 The controller that prints a line holds it. Pick the controller you will fail, written `<ctl-x>`: the VIP holder if
 it is controller 2 or 3, otherwise controller 2. Its VM is `<ctl-x-vm>` in the hosting terminal.
 
-Check the clusters before you break anything. On any controller (the MariaDB root password is `database_password` in
-`/etc/kolla/passwords.yml` on controller 1):
+Check the clusters before you break anything. On any controller:
 
 ```bash
-sudo docker exec mariadb mariadb -u root -p'<database-password>' -e "SHOW STATUS LIKE 'wsrep_cluster_%'"
+sudo docker exec -it mariadb mariadb -u root -p -e "SHOW STATUS LIKE 'wsrep_cluster_%'"
 sudo docker exec rabbitmq rabbitmqctl cluster_status
 ```
+
+`mariadb` asks for the root password: it is `database_password` in `/etc/kolla/passwords.yml` on controller 1
+(`sudo grep '^database_password' /etc/kolla/passwords.yml`). Type it at the prompt rather than after `-p`, so that it
+stays out of your shell history and the process list.
 
 `wsrep_cluster_size` is `3` and `wsrep_cluster_status` is `Primary`; RabbitMQ lists three running nodes. (The
 2026.1 MariaDB image has no `mysql` client: use `mariadb`.)
