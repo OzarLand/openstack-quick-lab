@@ -15,8 +15,10 @@ for a personal machine with KVM, with no cloud cost, is [wanted](https://github.
 > - **What it is:** scripts that build a complete, disposable OpenStack (2026.1) on one virtual machine, and six
 >   exercises where you break it on purpose and repair it with documented procedures. For learning and for trying
 >   a procedure before production.
-> - **What it costs:** one VM for about an hour. One full run measured on the reference cloud: **€ _to be measured_**.
->   The script shows the estimated cost per hour and asks before creating anything.
+> - **What it costs:** one VM for about an hour. One full run (57 min) measured on Felcloud at its listed prices on
+>   2026-10-23: **about 0.05 EUR (0.19 TND)**, and about 1.37 EUR for each extra day the lab is left running
+>   ([cost details](variants/openstack-cloud/README.md#what-a-lab-cost-on-felcloud)). The script shows the
+>   estimated cost per hour and asks before creating anything.
 > - **The risk:** the VM costs money every hour it exists, until it is deleted. On a prepaid cloud, such as
 >   [Felcloud](https://felcloud.io/), the recommended starting point, spending cannot go beyond the credit loaded.
 >   On a pay-as-you-go cloud, set a budget alert first. One command deletes everything.
