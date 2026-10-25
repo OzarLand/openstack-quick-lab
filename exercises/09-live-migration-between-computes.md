@@ -1,11 +1,11 @@
 # Exercise 9. Live migration between the two computes
 
-> **Multinode variant** only: it needs two computes. **Not yet run on a lab**: the commands and what you should see
-> are written from the runbook and Nova's documentation, and are checked when the lab confirms them.
+> **Multinode variant** only: it needs two computes. Run on a lab on 2026-10-25 (multinode variant, 1 controller +
+> 2 computes): see the [lab review](https://github.com/OzarLand/openstack-quick-lab/pull/10#issuecomment-6397487220).
 
 **Goal:** move a running instance from one compute to the other while you ping it, and measure what its users would
 notice.
-**Time:** about 20 minutes (estimate, not yet run).
+**Time:** about 20 minutes (about 10 minutes of commands on the lab, plus reading).
 **Runbook:** [Moving instances off a host for maintenance](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/migration/moving-instances-off-a-host-for-maintenance.md) (`status: draft`: not yet
 checked on a lab; it also covers live migration)
 
@@ -50,8 +50,8 @@ ping -i 0.2 -D <floating-ip>
 Follow the runbook's **Resolution** for a live migration to a chosen host. On this lab the instances have no shared
 storage, so the migration also copies the disk (block migration); the runbook says which option that takes.
 
-> ⚠️ **State-changing.** Live-migrates `ex9-test` from `<compute-1>` to `<compute-2>`. It keeps running; a few pings
-> may be lost at the switch-over. Disposable lab only.
+> ⚠️ **State-changing.** Live-migrates `ex9-test` from `<compute-1>` to `<compute-2>`. It keeps running; its network
+> stops for a while at the switch-over, from a few seconds to, once on the lab, a few minutes. Disposable lab only.
 
 Follow its progress:
 
@@ -64,8 +64,11 @@ openstack server show ex9-test -c status -c OS-EXT-SRV-ATTR:host
 
 - The status goes `MIGRATING`, then `ACTIVE` again, and the host changes from `<compute-1>` to `<compute-2>`.
 - In the second session, stop the ping with Ctrl-C and read its summary: how many packets were lost, and for how
-  long? Note it: that is what a user of this instance would have noticed. For comparison, the variant's smoke test
-  measured 43 replies lost out of 166, about 8.6 s, for a live migration of 35 s on 2026-10-25.
+  long? Note it: that is what a user of this instance would have noticed. The gap varies from run to run: on this
+  variant, the runs of 2026-10-25 lost between 1.8 s and 8.6 s. Once, the replies stopped at the switch-over and
+  did not come back before the ping was stopped; SSH timed out for a few minutes, then the instance answered again
+  within about 5 minutes, without having restarted. The cause is not known yet. If that happens to you, wait a few
+  minutes before you go on.
 - On `<compute-2>`, the instance now runs in the hypervisor; on `<compute-1>`, it is gone. On each compute (from
   controller 1: `ssh -i ~/.ssh/quicklab_ed25519 ubuntu@<compute-address>`):
 
