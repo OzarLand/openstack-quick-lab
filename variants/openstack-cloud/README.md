@@ -14,8 +14,9 @@ source ~/kolla-venv/bin/activate; . /etc/kolla/admin-openrc.sh; openstack server
 ./destroy.sh                                             # back on your computer: deletes everything, after asking (under 1 min)
 ```
 
-- **`SSH_FROM`**: the address allowed to SSH to the VM. With a floating IP (`FLOATING_NETWORK` set), your own public
-  address. Without one, the address of the host you connect from, in the same network (a jump host).
+- **`SSH_FROM`**: the address allowed to SSH to the VM, as a CIDR: one address is a `/32` (for example
+  `198.51.100.7/32`). With a floating IP (`FLOATING_NETWORK` set), your own public address. Without one, the address
+  of the host you connect from, in the same network (a jump host). `create.sh` refuses anything wider than a `/16`.
 - **A dropped connection**: the deploy runs on the VM itself, and `deploy.sh` follows its output for about an hour.
   If your terminal closes or the connection drops, the deploy goes on: run `./deploy.sh` again to follow it. After a
   failure, running it again resumes from the failed step.
