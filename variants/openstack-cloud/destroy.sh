@@ -1,17 +1,30 @@
 #!/usr/bin/env bash
 # Delete everything create.sh created for this lab, after confirmation. Safe to run again: what is already gone is
-# skipped. Exits non-zero if anything could not be deleted.
+# skipped. Fails closed: if the cloud cannot be reached or a listing fails, it stops with a non-zero exit, deletes
+# nothing more, and keeps .state/ (with the lab's private key). Exits non-zero if anything is left.
 . "$(dirname "$0")/lib.sh"
 load
-# Find each resource from the IDs recorded by create.sh, and by its name in case the state was lost or the creation
-# stopped half-way.
-find_id() { os "$@" -f value -c id 2>/dev/null || true; }
-SERVER="${SERVER:-$(find_id server show "$VM")}"
-ROOT_VOLUME="${BOOT_VOLUME_ID:-$(find_id volume show "${VM}-root")}"
-PORT="${PORT:-$(find_id port show "${VM}-port")}"
-SG="${SG:-$(find_id security group show "${VM}-sg")}"
-KEYPAIR="${KEYPAIR:-$(os keypair show "${VM}-key" -f value -c name 2>/dev/null || true)}"
-FIP_ID="${FIP_ID:-$(os floating ip list --long -f value -c ID -c Description 2>/dev/null | awk -v d="$VM" '$2==d{print $1}' | head -1)}"
+os token issue -f value -c expires >/dev/null || die "Cannot authenticate with OS_CLOUD=$OS_CLOUD: nothing deleted, $STATE_DIR kept."
+# lst <what> <openstack args...>: a listing that must succeed. Each call is a plain assignment at the top level, so
+# that set -e stops the script when it fails (a failure inside a pipeline or a $(...) group would not).
+lst() { local what=$1 out; shift; out=$(os "$@" 2>&1) || die "Could not list the $what: $(printf '%s' "$out" | tail -1). Nothing more deleted, $STATE_DIR kept."; printf '%s\n' "$out"; }
+first() { awk -v k="$1" -v c="$2" '$c==k && !f {print $1; f=1}'; }   # first <name> <column>: ID of the first row named so
+inventory() { # fills SERVERS VOLUMES PORTS SGS KEYS FIPS with the lab's rows; stops the script if a listing fails
+  SERVERS=$(lst servers server list --name "^${VM}\$" -f value -c ID -c Name)
+  VOLUMES=$(lst volumes volume list -f value -c ID -c Name -c Status)
+  PORTS=$(lst ports port list --name "${VM}-port" -f value -c ID -c Name)
+  SGS=$(lst "security groups" security group list -f value -c ID -c Name)
+  KEYS=$(lst "key pairs" keypair list -f value -c Name)
+  FIPS=$(lst "floating IPs" floating ip list --long -f value -c ID -c Description)
+}
+# Find each resource by its name: it works even if the state was lost or the creation stopped half-way.
+inventory
+SERVER=$(printf '%s\n' "$SERVERS" | first "$VM" 2)
+ROOT_VOLUME=$(printf '%s\n' "$VOLUMES" | first "${VM}-root" 2)
+PORT=$(printf '%s\n' "$PORTS" | first "${VM}-port" 2)
+SG=$(printf '%s\n' "$SGS" | first "${VM}-sg" 2)
+KEYPAIR=$(printf '%s\n' "$KEYS" | awk -v n="${VM}-key" '$1==n && !f {print; f=1}')
+FIP_ID=$(printf '%s\n' "$FIPS" | first "$VM" 2)
 echo "About to delete, in cloud '$OS_CLOUD':"
 [ -n "$SERVER" ]      && echo "  server         $VM ($SERVER)"
 [ -n "$ROOT_VOLUME" ] && echo "  root volume    ${VM}-root ($ROOT_VOLUME)"
@@ -45,13 +58,14 @@ fi
 
 say "Checking that nothing is left"
 sleep 5
-LEFT=$( { os server list --name "^${VM}\$" -f value -c ID -c Name
-          os volume list --name "${VM}-root" -f value -c ID -c Name -c Status
-          [ -n "$ROOT_VOLUME" ] && os volume show "$ROOT_VOLUME" -f value -c id -c status 2>/dev/null
-          os port list --name "${VM}-port" -f value -c ID -c Name
-          os security group list -f value -c ID -c Name | awk -v n="${VM}-sg" '$2==n'
-          os keypair list -f value -c Name | grep -x "${VM}-key"
-          os floating ip list --long -f value -c ID -c Description | awk -v d="$VM" '$2==d'; } 2>/dev/null || true)
+# Every listing must succeed again: a failed listing is not "nothing left".
+inventory
+LEFT=$( { printf '%s\n' "$SERVERS" | awk -v n="$VM" '$2==n'
+          printf '%s\n' "$VOLUMES" | awk -v n="${VM}-root" '$2==n'
+          printf '%s\n' "$PORTS" | awk -v n="${VM}-port" '$2==n'
+          printf '%s\n' "$SGS" | awk -v n="${VM}-sg" '$2==n'
+          printf '%s\n' "$KEYS" | awk -v n="${VM}-key" '$1==n'
+          printf '%s\n' "$FIPS" | awk -v d="$VM" '$2==d'; } )
 if [ -n "$LEFT" ]; then echo "STILL PRESENT in the cloud (and possibly billed):"; echo "$LEFT"; exit 1; fi
 [ "$FAILED" = 0 ] || { echo "Some deletions failed (see above). Run ./destroy.sh again."; exit 1; }
 say "Deleted in $(( $(date +%s)-T0 )) s. Nothing of $VM is left in the cloud."

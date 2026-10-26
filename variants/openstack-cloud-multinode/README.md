@@ -9,13 +9,13 @@ dies, and, with 5 VMs, a controller that dies.
 ```bash
 cp config.example.env config.env && $EDITOR config.env   # OS_CLOUD, NETWORK, SSH_FROM, the two prices; FLOATING_NETWORK if you use one; CONTROLLERS="3" for 5 VMs
 ./create.sh                                              # shows the cost of all the VMs, asks, creates them (3 to 4 min)
-./deploy.sh                                              # deploys OpenStack across them (60 to 70 min); run it inside tmux
+./deploy.sh                                              # deploys OpenStack across them (60 to 70 min)
 ssh -i .state/quicklab-multi-1/id_ed25519 ubuntu@<controller-1-address>   # then, on controller 1:
 source ~/kolla-venv/bin/activate; . /etc/kolla/admin-openrc.sh; openstack server list
 ./destroy.sh                                             # back on your computer: deletes everything, after asking
 ```
 
-- **`SSH_FROM`** and **tmux**: as in the single-VM [quick start](../openstack-cloud/README.md#quick-start).
+- **`SSH_FROM`** and **a dropped connection**: as in the single-VM [quick start](../openstack-cloud/README.md#quick-start).
 - **Time**: plan about 75 minutes (3 VMs) to 90 minutes (5 VMs) before your first exercise: 63 and 73 minutes
   measured for `create.sh` and `deploy.sh`, plus filling in `config.env` and logging in.
 
