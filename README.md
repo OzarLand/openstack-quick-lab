@@ -5,6 +5,14 @@
 **Scripts that build a complete, disposable OpenStack (2026.1) on a cloud VM in about an hour, exercises to break
 and repair it, and one command that deletes it all.**
 
+> **Status: early, tested on one cloud.** Both variants and all eleven exercises were run end to end between
+> 2026-10-23 and 2026-10-25 by OzarLand's AI lab agents (exercises 10 and 11 were edited after their run and not
+> run again), on one OpenStack cloud (Felcloud, the reference cloud
+> below), with OpenStack 2026.1, Kolla-Ansible 22.2.0 and Ubuntu 24.04, in a project reaching the Internet through an
+> HTTPS proxy. Not tested yet: other clouds, a project with direct Internet access, and a run by a person following the
+> guide. Known script gaps are tracked in [issue #25](https://github.com/OzarLand/openstack-quick-lab/issues/25).
+> Reports from your cloud are the most useful contribution.
+
 On a prepaid cloud you cannot spend more than your credit; on any other cloud, set a budget alert first. Part of
 [OzarLand](https://github.com/OzarLand/ozarland), a knowledge-sharing space for OpenStack operators.
 
@@ -62,7 +70,7 @@ Then do your first exercise: [DHCP agents down](exercises/01-dhcp-agents-down.md
 > 🛑 **A lab left running keeps costing money** on a pay-as-you-go cloud, and keeps using credit on a prepaid one.
 >
 > 1. Run `./destroy.sh` in the variant's directory. After asking, it deletes everything `create.sh` created (VMs,
->    key, security group, ports, floating IP, root volumes if any) and fails loudly if anything is left.
+>    key, security group, ports, floating IP, root volumes if any, and the multinode variant's lab network and subnet) and fails loudly if anything is left.
 > 2. Check in your provider's console, or with `openstack server list`, `openstack volume list` and
 >    `openstack floating ip list`, that nothing from the lab is left.
 > 3. On a pay-as-you-go cloud, check the next day that the usage really stopped.
@@ -87,7 +95,7 @@ Each exercise breaks one thing on purpose and repairs it with a runbook from
 | 7 | [A compute goes down: fence it before you evacuate](exercises/07-compute-down-fence-before-evacuate.md) | Multinode | [Fence it before you evacuate](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/recovery/compute-host-failure-fence-before-evacuate.md) |
 | 8 | [Drain a compute for planned maintenance](exercises/08-drain-a-compute-for-maintenance.md) | Multinode | [Moving instances off a host for maintenance](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/migration/moving-instances-off-a-host-for-maintenance.md) |
 | 9 | [Live migration between the two computes](exercises/09-live-migration-between-computes.md) | Multinode | [Moving instances off a host for maintenance](https://github.com/OzarLand/openstack-vm-runbooks/blob/main/migration/moving-instances-off-a-host-for-maintenance.md) |
-| 10 | [Lose one controller: what keeps working](exercises/10-lose-one-controller.md) | Multinode, 3 controllers | Pattern: [three controllers, two computes](https://github.com/OzarLand/kolla-ansible-deployment-patterns/blob/main/topologies/three-controllers-two-computes-nested-in-an-openstack-cloud.md) |
+| 10 | [Lose one controller: what keeps working](exercises/10-lose-one-controller.md) | Multinode, 3 controllers | Pattern (`draft`): [three controllers, two computes](https://github.com/OzarLand/kolla-ansible-deployment-patterns/blob/main/topologies/three-controllers-two-computes-nested-in-an-openstack-cloud.md) |
 | 11 | [Lose two controllers: quorum lost, and recovered](exercises/11-lose-two-controllers-quorum.md) | Multinode, 3 controllers | Procedure: [MariaDB cluster recovery](https://github.com/OzarLand/kolla-ansible-deployment-patterns/blob/main/deployment-errors/unattended-upgrades-during-deploy-breaks-the-mariadb-cluster.md#recover-the-failed-deploy) |
 
 > **In one minute (for managers)**

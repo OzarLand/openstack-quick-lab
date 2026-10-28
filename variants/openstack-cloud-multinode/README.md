@@ -1,6 +1,6 @@
 # OpenStack on several VMs of an OpenStack cloud (multinode)
 
-A multinode OpenStack (2026.1, deployed with Kolla-Ansible) on 3 or 5 VMs of any OpenStack cloud, in a little over
+A multinode OpenStack (2026.1, deployed with Kolla-Ansible) on 3 or 5 VMs of an OpenStack cloud (tested on one cloud so far), in a little over
 an hour. One command deletes it all. It shows what one VM cannot: instances moving between computes, a compute that
 dies, and, with 5 VMs, a controller that dies.
 
@@ -256,7 +256,7 @@ Last run on 2026-10-25, both sizes, on the reference cloud: OpenStack 2026.1, Ko
 | **`deploy.sh` in all** | **59 min 34 s** | **69 min 13 s** |
 
 - The 5-VM size was run twice; the other run took 70 minutes from `create.sh` to the end of `deploy.sh`.
-- On the 5-VM lab, the smoke test also checked the HA control plane: the VIP held by one controller, Galera with
+- On the 5-VM lab, a manual check after the smoke test (not part of `deploy.sh`) found the VIP held by one controller, Galera with
   3 nodes `Synced` and `Primary`, RabbitMQ with 3 running nodes, HAProxy's Keystone backends `UP` on the three
   controllers, and Nova's and Neutron's agents alive on all three.
 - The live migration of the smoke test lost, to a ping every 0.2 s: 8.6 s on the 3-VM run, 2.8 s and 2.4 s on the

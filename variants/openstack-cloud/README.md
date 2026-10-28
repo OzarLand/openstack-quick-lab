@@ -1,6 +1,6 @@
 # OpenStack on one VM of an OpenStack cloud
 
-A complete OpenStack (2026.1, deployed with Kolla-Ansible) on a single VM of any OpenStack cloud, in about an hour.
+A complete OpenStack (2026.1, deployed with Kolla-Ansible) on a single VM of an OpenStack cloud (tested on one cloud so far, see [Limits](#limits)), in about an hour.
 One command deletes it all.
 
 ## Quick start

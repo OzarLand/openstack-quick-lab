@@ -4,8 +4,10 @@ Six short exercises on the all-in-one lab, three on the multinode variant and tw
 one breaks one thing on purpose, shows you what an operator would see, and walks you through the repair with a
 runbook from [openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks) (exercises 10 and 11 use
 pages of [kolla-ansible-deployment-patterns](https://github.com/OzarLand/kolla-ansible-deployment-patterns)
-instead). The runbooks of exercises 1 to 9 were
-checked on a lab (`status: lab-verified`).
+instead). The runbooks of exercises 1 to 9 are
+`status: lab-verified`; exercise 10 relies on a `draft` pattern page. The exercises themselves were run on the
+reference cloud by OzarLand's lab agents (1 to 6 on 2026-10-23, 7 to 11 on 2026-10-25); 10 and 11 were edited
+after that run.
 
 | # | Exercise | Time | What you learn |
 |---|---|---|---|

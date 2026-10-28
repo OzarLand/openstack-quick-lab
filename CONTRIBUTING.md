@@ -57,7 +57,7 @@ exercise on your variant.
 
 ## Adding an exercise
 
-An exercise breaks one thing on the all-in-one lab and repairs it with an **existing runbook** of
+An exercise breaks one thing on a lab variant and repairs it with an **existing runbook** (or deployment-pattern page) of
 [openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks), preferably one marked `lab-verified`. It
 sends readers to the runbook; it does not copy it.
 

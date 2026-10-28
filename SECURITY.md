@@ -21,8 +21,8 @@ repair a lab on purpose. Three kinds of security issues can arise:
 **Do not open a public issue or discussion for the first two cases.**
 
 Use GitHub private vulnerability reporting: "Report a vulnerability" in the Security tab of this repository. Only you
-and the maintainers see the report. While the repositories are private, contact the organization owner directly on
-GitHub instead. OzarLand has no e-mail contact.
+and the maintainers see the report. If the Security tab does not offer it, message the organization owner on
+GitHub. OzarLand has no e-mail contact.
 
 Questions, errors and proposals that involve nothing sensitive go in a GitHub issue. Anything about the code of
 conduct or a personal matter follows the [code of conduct](CODE_OF_CONDUCT.md#reporting).
