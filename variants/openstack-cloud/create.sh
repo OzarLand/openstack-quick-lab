@@ -45,7 +45,7 @@ else
   [ "$(os flavor show "$FLAVOR" -f value -c disk)" -lt 50 ] && BOOT_VOLUME=50
 fi
 # Image: the most recent active image named like "Ubuntu 24.04".
-[ -z "$IMAGE" ] && IMAGE=$(os image list --status active -f value -c Name | { grep -iE 'ubuntu.*24\.04' || true; } | sort | tail -1)
+[ -z "$IMAGE" ] && IMAGE=$(os image list --status active --sort created_at:desc -f value -c Name | { grep -iE 'ubuntu.*24\.04' || true; } | head -1)
 [ -n "$IMAGE" ] || die "No active Ubuntu 24.04 image found: set IMAGE in config.env."
 os network show "$NETWORK" >/dev/null || die "Network $NETWORK not found."
 [ -n "$FLOATING_NETWORK" ] && { os network show "$FLOATING_NETWORK" >/dev/null || die "Network $FLOATING_NETWORK not found."; }

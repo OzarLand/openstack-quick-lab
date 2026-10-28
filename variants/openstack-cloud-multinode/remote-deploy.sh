@@ -17,8 +17,8 @@ VIP_ADDR="${VIP:-$CTL1_ADDR}"
 read -r EXT_START EXT_END < <(python3 -c "import ipaddress as i; h=list(i.ip_network('$LAB_EXT_CIDR').hosts()); print(h[99], h[198])")
 PX=(); [ -n "$HTTPS_PROXY" ] && PX=(env "https_proxy=$HTTPS_PROXY" "http_proxy=$HTTPS_PROXY")
 NOPX="localhost,127.0.0.1,$VIP_ADDR,$(IFS=,; echo "${ADDRS[*]}"),$(IFS=,; echo "${NAMES[*]}")${DOCKER_REGISTRY:+,${DOCKER_REGISTRY%%:*}}"
-sshn() { local a=$1; shift; ssh -n -i "$LKEY" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 -o BatchMode=yes "ubuntu@$a" "$@"; }
-sshs() { local a=$1; shift; ssh -i "$LKEY" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 -o BatchMode=yes "ubuntu@$a" "$@"; }
+sshn() { local a=$1; shift; ssh -n -i "$LKEY" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 -o BatchMode=yes "${SSH_USER:-ubuntu}@$a" "$@"; }
+sshs() { local a=$1; shift; ssh -i "$LKEY" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 -o BatchMode=yes "${SSH_USER:-ubuntu}@$a" "$@"; }
 
 step() { # step <name> <description> <function>
   if [ -f "$M/done-$1" ]; then echo "== $2: already done ($(cat "$M/done-$1") s)"; return; fi
@@ -92,7 +92,7 @@ configure() {
   for i in "${!NAMES[@]}"; do
     ifc=$(sshn "${ADDRS[$i]}" "ip -4 route show default | awk '{print \$5; exit}'")
     ext=""; [ "${ROLES[$i]}" = ctl ] && ext=" neutron_external_interface=$(iface_of "${ADDRS[$i]}" "${EXTMACS[$i]}")"
-    hosts+="${NAMES[$i]} ${ROLES[$i]} ansible_host=${ADDRS[$i]} ansible_user=ubuntu ansible_become=true ansible_ssh_private_key_file=$LKEY network_interface=$ifc$ext"$'\n'
+    hosts+="${NAMES[$i]} ${ROLES[$i]} ansible_host=${ADDRS[$i]} ansible_user=${SSH_USER:-ubuntu} ansible_become=true ansible_ssh_private_key_file=$LKEY network_interface=$ifc$ext"$'\n'
   done
   printf '%s' "$hosts" | python3 -c '
 import re, sys
