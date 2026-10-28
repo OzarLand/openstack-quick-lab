@@ -136,7 +136,8 @@ The same as the [single-VM variant](../openstack-cloud/README.md):
 - **Every resource is named from the prefix** `${PREFIX}${LAB}-` (default `quicklab-multi-1-`). See
   [how resources are named](#how-resources-are-named).
 - 🛑 **`destroy.sh` deletes everything in the project whose name starts with `${PREFIX}${LAB}-`**, after listing it
-  and asking. Keep `PREFIX` specific to the lab: never a prefix that other resources of your project share.
+  and asking. Keep `PREFIX` specific to the lab: never a prefix that other resources of your project share. The
+  scripts refuse a `PREFIX` that does not start with `quicklab` unless you set `ALLOW_ANY_PREFIX=yes` in `config.env`.
 - **Destroy checks that nothing is left.** It lists every kind of resource again after deleting, and fails loudly if
   anything of the lab is still there.
 

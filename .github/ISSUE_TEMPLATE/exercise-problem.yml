@@ -19,6 +19,11 @@ body:
         - 4. Restarting nova_libvirt
         - 5. Restarting the Open vSwitch agent
         - 6. Instance unreachable from outside
+        - 7. A compute goes down, fence it before you evacuate
+        - 8. Drain a compute for planned maintenance
+        - 9. Live migration between the two computes
+        - 10. Lose one controller
+        - 11. Lose two controllers, quorum lost and recovered
         - the exercises index or another exercise
     validations:
       required: true

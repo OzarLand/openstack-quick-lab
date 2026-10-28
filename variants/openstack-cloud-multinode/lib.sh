@@ -15,6 +15,12 @@ CONTROLLERS="${CONTROLLERS:-1}"; COMPUTES="${COMPUTES:-2}"
 case "$CONTROLLERS" in 1|3) ;; *) echo "CONTROLLERS must be 1 or 3 (it is $CONTROLLERS)." >&2; exit 1 ;; esac
 case "$COMPUTES" in 1|2|3|4) ;; *) echo "COMPUTES must be between 1 and 4 (it is $COMPUTES)." >&2; exit 1 ;; esac
 LABNAME="${PREFIX}${LAB}"
+# destroy.sh deletes every resource of the project whose name starts with "${LABNAME}-": a prefix shared with
+# other resources would delete them too. Refuse a prefix that does not start with "quicklab", unless the user says so.
+case "$PREFIX" in
+  quicklab*) ;;
+  *) [ "${ALLOW_ANY_PREFIX:-}" = yes ] || { echo "PREFIX must start with \"quicklab\" (it is \"$PREFIX\"): destroy.sh deletes everything named \"\${PREFIX}\${LAB}-*\" in the project. Set ALLOW_ANY_PREFIX=yes in config.env only if no other resource of the project can start with that name." >&2; exit 1; } ;;
+esac
 CTLS=(); for i in $(seq 1 "$CONTROLLERS"); do CTLS+=("${LABNAME}-ctl-$i"); done
 CMPS=(); for i in $(seq 1 "$COMPUTES"); do CMPS+=("${LABNAME}-cmp-$i"); done
 NODES=("${CTLS[@]}" "${CMPS[@]}")

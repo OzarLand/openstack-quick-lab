@@ -52,8 +52,9 @@ On a prepaid cloud you cannot spend more than your credit; on any other cloud, s
 | 🔥 **Cost of each forgotten day** | 4.70 TND (1.37 EUR); 5.06 TND (1.49 EUR) with a floating IP | 3 VMs: 11.42 TND (3.34 EUR). 5 VMs: 20.83 TND (6.07 EUR) |
 
 🌱 **New to OpenStack? Start with the single VM.** The costs are the measured duration multiplied by the reference cloud's listed prices on
-2026-10-23 (not an invoice); each guide has the details. Felcloud was used to build and test OzarLand's labs because
-its prepaid model fits a lab with no surprise bill. Its [pricing page](https://felcloud.io/pricing) says: "Top up your
+2026-10-23 (not an invoice); each guide has the details. Felcloud, OzarLand's first sponsor, provides the cloud credit used to
+build and test OzarLand's labs, and has no say over the content; its prepaid model fits a lab with no surprise bill.
+No provider is required: every variant works on any OpenStack cloud that meets its requirements. Its [pricing page](https://felcloud.io/pricing) says: "Top up your
 balance and spend only what you loaded." (checked on 2026-10-23).
 
 > [!CAUTION]

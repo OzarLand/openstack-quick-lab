@@ -58,10 +58,10 @@ Before reading on: disabling a compute moved nothing. What will you do with `ex8
 Follow the runbook from its **Quick checks**:
 
 1. Its checks before moving anything: the other compute is `up` and has room, and the instances to move are listed.
-   On this lab, the runbook's capacity check cannot be run yet: `openstack hypervisor list --long` no longer shows
-   vCPU and memory with this client, and `openstack allocation candidate list` needs the `osc-placement` client
-   plugin, which the lab's scripts do not install yet. Skip that check here: the other compute has room for two
-   `m1.tiny` instances.
+   `openstack hypervisor list --long` no longer shows vCPU and memory with this client; use the runbook's capacity
+   check through Placement instead: the multinode scripts install the `osc-placement` client plugin, and
+   `openstack allocation candidate list --resource VCPU=1` lists one candidate per compute (run on the lab on
+   2026-10-28, osc-placement 4.9.1).
 2. Move each instance off `<compute-1>`, live, as the runbook's **Resolution** shows. On this lab the instances have no
    shared storage, so a live migration also copies their disk (block migration); the runbook says which option that
    takes.

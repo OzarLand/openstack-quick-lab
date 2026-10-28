@@ -60,7 +60,7 @@ if [ -z "$CONTROLLER_FLAVOR" ]; then read -r CONTROLLER_FLAVOR CTL_BOOT < <(pick
 if [ -z "$COMPUTE_FLAVOR" ]; then read -r COMPUTE_FLAVOR CMP_BOOT < <(pick_flavor 8192); else CMP_BOOT=$(flavor_volume "$COMPUTE_FLAVOR"); fi
 [ -n "$CONTROLLER_FLAVOR" ] || die "No flavor with at least 4 vCPU and 16 GB of RAM for the controllers: set CONTROLLER_FLAVOR in config.env."
 [ -n "$COMPUTE_FLAVOR" ] || die "No flavor with at least 4 vCPU and 8 GB of RAM for the computes: set COMPUTE_FLAVOR in config.env."
-[ -z "$IMAGE" ] && IMAGE=$(os image list --status active -f value -c Name | { grep -iE 'ubuntu.*24\.04' || true; } | sort | tail -1)
+[ -z "$IMAGE" ] && IMAGE=$(os image list --status active --sort created_at:desc -f value -c Name | { grep -iE 'ubuntu.*24\.04' || true; } | head -1)
 [ -n "$IMAGE" ] || die "No active Ubuntu 24.04 image found: set IMAGE in config.env."
 desc() { echo "$(os flavor show "$1" -f value -c vcpus) vCPU, $(os flavor show "$1" -f value -c ram) MB RAM, $(os flavor show "$1" -f value -c disk) GB disk"; }
 

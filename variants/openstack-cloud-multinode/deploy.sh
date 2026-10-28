@@ -24,7 +24,7 @@ else
   "${SCP[@]}" "$NODEFILE" "$SSH_USER@$CTL_ADDRESS:.quicklab/nodes"
   # The lab's private key, so that controller 1 reaches the other VMs (Ansible). It never leaves the lab.
   "${SCP[@]}" "$KEY" "$SSH_USER@$CTL_ADDRESS:.ssh/quicklab_ed25519"
-  for v in KOLLA_ANSIBLE_VERSION ANSIBLE_CORE_VERSION LAB_EXT_CIDR EXT_GW EXT_PREFIX GWMAC VIP CONTROLLERS HTTPS_PROXY NTP_SERVER APT_HTTPS DOCKER_REGISTRY OPENSTACK_TAG; do printf 'export %s=%q\n' "$v" "${!v:-}"; done > "$STATE_DIR/remote.env"; chmod 600 "$STATE_DIR/remote.env"
+  for v in SSH_USER KOLLA_ANSIBLE_VERSION ANSIBLE_CORE_VERSION LAB_EXT_CIDR EXT_GW EXT_PREFIX GWMAC VIP CONTROLLERS HTTPS_PROXY NTP_SERVER APT_HTTPS DOCKER_REGISTRY OPENSTACK_TAG; do printf 'export %s=%q\n' "$v" "${!v:-}"; done > "$STATE_DIR/remote.env"; chmod 600 "$STATE_DIR/remote.env"
   "${SCP[@]}" "$STATE_DIR/remote.env" "$SSH_USER@$CTL_ADDRESS:.quicklab/remote.env"
   ssh_ctl 'rm -f ~/.quicklab/run.rc; nohup bash -c ". ~/.quicklab/remote.env; bash ~/remote-deploy.sh; echo \$? > ~/.quicklab/run.rc" > ~/.quicklab/run.log 2>&1 < /dev/null & echo $! > ~/.quicklab/run.pid'
 fi
