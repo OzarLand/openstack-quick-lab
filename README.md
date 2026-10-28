@@ -37,7 +37,8 @@ and repair it, and one command that deletes it all.**
 > Reports from your cloud are the most useful contribution.
 
 
-Part of [OzarLand](https://github.com/OzarLand/ozarland), a knowledge-sharing space for OpenStack operators.
+Part of [OzarLand](https://github.com/OzarLand/ozarland): *a shared land for better OpenStack operations.*
+
 On a prepaid cloud you cannot spend more than your credit; on any other cloud, set a budget alert first.
 
 ## Pick your lab
@@ -173,6 +174,21 @@ flowchart LR
 | 🏗️ | How the labs are built: the [all-in-one lab pattern](https://github.com/OzarLand/kolla-ansible-deployment-patterns/blob/main/topologies/all-in-one-lab-on-a-single-vm.md) and the [multinode pattern](https://github.com/OzarLand/kolla-ansible-deployment-patterns/blob/main/topologies/three-controllers-two-computes-nested-in-an-openstack-cloud.md). Each guide states the releases its scripts were last run on. |
 | 🔒 | This repository never contains credentials (`clouds.yaml` with secrets, `passwords.yml`) or marketing. Keep yours out of any fork or pull request. |
 | 🤝 | New variants, exercises and fixes are welcome: [CONTRIBUTING.md](CONTRIBUTING.md). Any provider can be added as a variant on equal terms; nothing in the exercises depends on the provider. |
+
+## 🌍 Part of OzarLand
+
+**OzarLand: a shared land for better OpenStack operations.** It started as a personal initiative by Soufian Zaouam
+to share practical OpenStack operational knowledge, and it is meant to grow into a space where operators exchange
+experience, document solutions and help each other run more reliable platforms. It is open to everyone: your
+knowledge, questions and corrections are welcome.
+
+| | Repository | What it holds |
+|:-:|---|---|
+| | [ozarland](https://github.com/OzarLand/ozarland) | Start here: newcomer path, community rules, [Discussions](https://github.com/OzarLand/ozarland/discussions) |
+| 🔧 | [openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks) | Symptom-driven runbooks for instance problems |
+| 🏗️ | [kolla-ansible-deployment-patterns](https://github.com/OzarLand/kolla-ansible-deployment-patterns) | Ways to deploy with Kolla-Ansible, compared |
+| 🧪 | `openstack-quick-lab` **(you are here)** | A disposable OpenStack lab to practise on |
+| 🤖 | [openstack-operator-skills](https://github.com/OzarLand/openstack-operator-skills) | Claude skills that apply this knowledge |
 
 ## ⚖️ License
 
