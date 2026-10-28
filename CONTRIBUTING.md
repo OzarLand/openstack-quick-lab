@@ -57,8 +57,8 @@ exercise on your variant.
 
 ## Adding an exercise
 
-An exercise breaks one thing on a lab variant and repairs it with an **existing runbook** (or deployment-pattern page) of
-[openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks), preferably one marked `lab-verified`. It
+An exercise breaks one thing on a lab variant and repairs it with an **existing runbook** of [openstack-vm-runbooks](https://github.com/OzarLand/openstack-vm-runbooks) (or a page of
+[kolla-ansible-deployment-patterns](https://github.com/OzarLand/kolla-ansible-deployment-patterns)), preferably one marked `lab-verified`. It
 sends readers to the runbook; it does not copy it.
 
 Follow the structure of the existing exercises: goal, time, before you start, break it (with its ⚠️ warning), what

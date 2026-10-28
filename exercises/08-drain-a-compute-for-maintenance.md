@@ -60,7 +60,8 @@ Follow the runbook from its **Quick checks**:
 1. Its checks before moving anything: the other compute is `up` and has room, and the instances to move are listed.
    On this lab, the runbook's capacity check cannot be run yet: `openstack hypervisor list --long` no longer shows
    vCPU and memory with this client, and `openstack allocation candidate list` needs the `osc-placement` client
-   plugin, which the lab's scripts do not install yet. Skip that check here: the other compute has room for two
+   plugin. The multinode scripts install it since this exercise was last run, so the command should now be available;
+   this step was not re-run with it. If it is missing, skip that check here: the other compute has room for two
    `m1.tiny` instances.
 2. Move each instance off `<compute-1>`, live, as the runbook's **Resolution** shows. On this lab the instances have no
    shared storage, so a live migration also copies their disk (block migration); the runbook says which option that
