@@ -37,7 +37,7 @@ and repair it, and one command that deletes it all.**
 > Reports from your cloud are the most useful contribution.
 
 
-Part of [🏝️ OzarLand](https://github.com/OzarLand/ozarland), a knowledge-sharing space for OpenStack operators.
+Part of [OzarLand](https://github.com/OzarLand/ozarland), a knowledge-sharing space for OpenStack operators.
 On a prepaid cloud you cannot spend more than your credit; on any other cloud, set a budget alert first.
 
 ## Pick your lab
